@@ -56,11 +56,12 @@ check_connection()
                    | sed '1!d')
   connection_types=("Wired Automatic" "Wired Manual" "Wireless")
 
-  if test_connection; then
+  if ! test_connection; then
     return 0
   fi
 
   print_title "Network Setup"
+  PS3="${SELECTION_PROMPT}"
 
   select _ in "${connection_types[@]}"; do
     case "$REPLY" in
