@@ -1,0 +1,54 @@
+## Copyright (c) 2017 Stephen Ribich
+##
+## Permission is hereby granted, free of charge, to any person obtaining a copy
+## of this software and associated documentation files (the "Software"), to deal
+## in the Software without restriction, including without limitation the rights
+## to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+## copies of the Software, and to permit persons to whom the Software is
+## furnished to do so, subject to the following conditions:
+##
+## The above copyright notice and this permission notice shall be included in
+## all copies or substantial portions of the Software.
+##
+## THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+## IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+## FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+## AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+## LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+## OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+## SOFTWARE.
+
+## Set the system locale and keyboard layout settings for both the virtual console and Xorg using
+## the localectl tool
+##
+## https://wiki.archlinux.org/index.php/keymap
+##
+select_keymap()
+{
+  local title
+  local info
+  local keymap_list
+
+  title="KEYMAP - Keyboard Configuration"
+  info="Set the system locale and keyboard layout settings for both the virtual console and Xorg using the localectl tool"
+
+  keymap_list=( $(localectl list-keymaps | tr '\n' ' ') )
+
+  print_title "${title}"
+  print_info "${info}"
+
+  PS3="${SELECTION_PROMPT}"
+
+  set_columns
+
+  select KEYMAP in "${keymap_list[@]}"; do
+    if contains_element keymap_list "${KEYMAP}"; then
+      localectl set-keymap --no-convert "${KEYMAP}"
+      break
+    else
+      invalid_option
+      print_title "${title}"
+      print_info "${info}"
+    fi
+  done
+}
