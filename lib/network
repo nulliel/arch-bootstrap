@@ -56,7 +56,7 @@ check_connection()
                    | sed '1!d')
   connection_types=("Wired Automatic" "Wired Manual" "Wireless")
 
-  if ! test_connection; then
+  if test_connection; then
     return 0
   fi
 
