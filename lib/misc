@@ -26,6 +26,24 @@ set_columns()
   COLUMNS="$(tput cols)"
 }
 
+set_prompt()
+{
+    PS3="${SELECTION_PROMPT}"
+}
+
+##
+##
+get_input()
+{
+    read -p "$1 [y/N]: " OPTION
+
+    if [[ -z "${OPTION}" ]]; then
+        OPTION="n"
+    fi
+
+    OPTION=$(printf "%s" "${OPTION}" | tr '[:upper:]' '[:lower:]')
+}
+
 ## Check whether an array ($1) contains an element ($2)
 ##
 contains_element()

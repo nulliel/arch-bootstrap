@@ -32,6 +32,7 @@ source "./lib/misc"
 
 source "./lib/step01_keymap"
 source "./lib/step02_editor"
+source "./lib/step03_partition_disk"
 
 SCRIPT_TITLE="Arch Bootstrap"
 
@@ -42,6 +43,12 @@ configure()
   print_title "${SCRIPT_TITLE}"
 
   get_boot_mode
+
+  if [[ "${UEFI}" -eq 0 ]]; then
+    printf "BIOS mode is not currently supported for this script"
+    exit 1
+  fi
+
   check_connection
 }
 
@@ -71,6 +78,7 @@ main()
 
     printf " 1) %s\n" "$(mainmenu_item "${checklist[1]}" "Select Keymap" "${KEYMAP}")"
     printf " 2) %s\n" "$(mainmenu_item "${checklist[2]}" "Select Editor" "${EDITOR}")"
+    printf " 3) %s\n" "$(mainmenu_item "${checklist[3]}" "Partition Disk" "")"
 
     printf "\n"
     printf " d) %s\n" "Done"
@@ -86,7 +94,11 @@ main()
       2)
         select_editor
         checklist[2]=1
-      ;;
+        ;;
+      3)
+        partition_disk
+        checklist[3]=1
+        ;;
       d)
         finish
         ;;

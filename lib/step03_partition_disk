@@ -1,0 +1,197 @@
+## Copyright (c) 2017 Stephen Ribich
+##
+## Permission is hereby granted, free of charge, to any person obtaining a copy
+## of this software and associated documentation files (the "Software"), to deal
+## in the Software without restriction, including without limitation the rights
+## to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+## copies of the Software, and to permit persons to whom the Software is
+## furnished to do so, subject to the following conditions:
+##
+## The above copyright notice and this permission notice shall be included in
+## all copies or substantial portions of the Software.
+##
+## THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+## IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+## FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+## AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+## LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+## OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+## SOFTWARE.
+
+# shellcheck disable=2155
+
+PARTITION_MOUNT=""
+PARTITION_LUKS=0
+
+PARTITION_SWAP_SIZE=0
+PARTITION_DISK_SIZE=0
+
+PARTITION_SWAP_SIZE_GB=0
+
+SIZE_OF_GIGABYTE=$(( 1024 * 1024 * 1024 ))
+
+## Unmount devices to prepare them for partitioning
+##
+umount_partitions()
+{
+    local partitions=(
+        $(lsblk -o MOUNTPOINT -nr \
+              | sed '/^$/d'       \
+              | sed '/SWAP/d'     \
+              | sort -r)
+    )
+
+    # Disable swap in case it is mapped to a mounted partition
+    swapoff -a
+
+    for i in "${partitions[@]}"; do
+        umount "${i}"
+    done
+}
+
+##
+##
+show_devices()
+{
+    local devices=$(grep "sd" /proc/devices \
+                        | awk '{print $1}' \
+                        | tr '\n' ',')
+
+    devices="${devices::-1}"
+
+    print_info "Devices"
+
+    lsblk -nlpI "${devices}"        \
+        | awk '{print $1,$4,$6,$7}' \
+        | column -t
+
+    printf "\n"
+}
+
+##
+##
+select_device()
+{
+    local title="Select Device"
+    local info="Select device to partition"
+    local device_list=( $(lsblk -d | awk '{if($6=="disk"){print "/dev/" $1}}') )
+
+    print_title "${title}"
+
+    show_devices
+    print_info "${info}"
+
+    set_columns
+    set_prompt
+
+    select device in "${device_list[@]}"; do
+        if contains_element device_list "${device}"; then
+            break;
+        else
+            invalid_option
+            print_title "${title}"
+
+            show_devices
+            print_info "${info}"
+        fi
+    done
+
+    PARTITION_MOUNT="${device}"
+}
+
+##
+##
+get_recommended_partition_size()
+{
+    local device_size=$(blockdev --getsize64 "${PARTITION_MOUNT}")
+    local memory_size=$(free -g --si | grep "Mem:" | awk '{print $2}')
+
+    PARTITION_SWAP_SIZE=0
+    PARTITION_DISK_SIZE=0
+
+    if [[ "${memory_size}" -le 2 ]]; then
+        PARTITION_SWAP_SIZE=$(( memory_size * SIZE_OF_GIGABYTE * 2 ))
+    elif [[ "${memory_size}" -le 8 ]]; then
+        PARTITION_SWAP_SIZE=$(( memory_size * SIZE_OF_GIGABYTE ))
+    elif [[ "${memory_size}" -le 64 ]]; then
+        PARTITION_SWAP_SIZE=$(( memory_size * SIZE_OF_GIGABYTE / 2 ))
+    else
+        PARTITION_SWAP_SIZE=$(( 4 * SIZE_OF_GIGABYTE ))
+    fi
+
+    PARTITION_DISK_SIZE=$(( device_size - PARTITION_SWAP_SIZE ))
+    PARTITION_SWAP_SIZE_GB=$(( PARTITION_SWAP_SIZE / SIZE_OF_GIGABYTE ))
+}
+
+##
+##
+print_disk_statistics()
+{
+    local device_size=$(blockdev --getsize64 "${PARTITION_MOUNT}")
+    local memory_size=$(free -g --si | grep "Mem:" | awk '{print $2}')
+
+    local device_size_gb=$(( device_size / SIZE_OF_GIGABYTE ))
+    local swap_size_gb=$(( PARTITION_SWAP_SIZE / SIZE_OF_GIGABYTE ))
+    local disk_size_gb=$(( PARTITION_DISK_SIZE / SIZE_OF_GIGABYTE ))
+
+    print_info "Device Information:"
+
+    printf "Device size: %iGB\n" "${device_size_gb}"
+    printf "Memory size: %iGB\n" "${memory_size}"
+    printf "\n"
+    printf "Recommended swap size: %iGB\n" "${swap_size_gb}"
+    printf "Recommended disk size: %iGB\n" "${disk_size_gb}"
+    printf "\n"
+}
+
+## https://wiki.archlinux.org/index.php/Partitioning
+##
+partition_device()
+{
+    title="Partition Device"
+    info="Would you like to partition the device ${PARTITION_MOUNT} with the recommended partition sizes?"
+
+    print_title "${title}"
+
+    get_recommended_partition_size
+    print_disk_statistics
+
+    get_input "${info}"
+
+    if [[ "${OPTION}" == 'y' ]]; then
+        sgdisk -Z "${PARTITION_MOUNT}"
+
+        sgdisk -n 0:0:+512M -t 0:ef00 -c 0:"BOOT" "${PARTITION_MOUNT}"
+        sgdisk -n 0:0:+${PARTITION_SWAP_SIZE_GB}G -t 0:8200 -c 0:"SWAP" "${PARTITION_MOUNT}"
+        sgdisk -n 0:0:0 -t 0:8300 -c 0:"DATA" "${PARTITION_MOUNT}"
+    else
+        printf "\n"
+        printf "Please configure the disk manually using gparted.\n"
+        pause_function
+        gdisk
+    fi
+}
+
+setup_luks()
+{
+    title="LUKS"
+    info="Would you like to setup LUKS?"
+
+    print_title "${title}"
+
+    get_input "${info}"
+
+    if [[ "${OPTION}" == 'y' ]]; then
+        exit 0
+    fi
+}
+
+## Wrapper function for disk partitioning
+##
+partition_disk()
+{
+    # umount_partitions
+    select_device
+    partition_device
+    sleep 10
+}
