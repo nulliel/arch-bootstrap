@@ -26,6 +26,7 @@ cd "$(dirname "$(readlink -f "$0" || realpath "$0")")" || :
 source "./lib/print"
 source "./lib/menu"
 source "./lib/boot_mode"
+source "./lib/device"
 source "./lib/network"
 source "./lib/control_flow"
 source "./lib/misc"

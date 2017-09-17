@@ -22,6 +22,7 @@
 
 PARTITION_MOUNT=""
 PARTITION_LUKS=0
+PARTITION_LUKS_DISK=""
 
 PARTITION_SWAP_SIZE=0
 PARTITION_DISK_SIZE=0
@@ -166,32 +167,58 @@ partition_device()
         sgdisk -n 0:0:0 -t 0:8300 -c 0:"DATA" "${PARTITION_MOUNT}"
     else
         printf "\n"
-        printf "Please configure the disk manually using gparted.\n"
-        pause_function
-        gdisk
+        printf "Manual configuration is not currently supported.\n"
+        exit 0
     fi
 }
 
 setup_luks()
 {
-    title="LUKS"
-    info="Would you like to setup LUKS?"
+    local title="LUKS"
+    local info="Would you like to setup LUKS?"
+    local trim=1
 
     print_title "${title}"
 
     get_input "${info}"
 
-    if [[ "${OPTION}" == 'y' ]]; then
-        exit 0
+    if [[ "${OPTION}" == 'n' ]]; then
+        return 0
     fi
+
+    if get_trim "${PARTITION_MOUNT}"; then
+        trim=0
+    fi
+
+    cryptsetup --cipher aes-xts-plain64 --key-size 512 --hash sha512 --iter-time 5000 --use-random --verify-passphrase luksFormat "${PARTITION_MOUNT}3"
+    cryptsetup open --type luks $([[ $trim -eq 0 ]] && printf "--allow-discards") "${PARTITION_MOUNT}3" crypt
+    PARTITION_LUKS=1
+    PARTITION_LUKS_DISK=$(printf "${PARTITION_MOUNT}3" | sed 's/\/dev\///')
+}
+
+##
+##
+format_partition()
+{
+    local trim=1
+
+    if get_trim "${PARTITION_MOUNT}"; then
+        trim=0
+    fi
+
+
+    mkfs.fat -F32 "${PARTITION_MOUNT}1"
+    mkfs.vfat "${PARTITION_MOUNT}2"
+    mkfs.ext4 "${PARTITION_MOUNT}3" "$([[ $trim -eq 0 ]] && printf "-E discard")"
 }
 
 ## Wrapper function for disk partitioning
 ##
 partition_disk()
 {
-    # umount_partitions
+    umount_partitions
     select_device
     partition_device
-    sleep 10
+    setup_luks
+    format_partition
 }
