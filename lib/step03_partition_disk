@@ -300,15 +300,27 @@ print_scheme()
     printf "\n"
 }
 
+## Assign data partitions a new device id. This is run every time the partition
+## list is modified to preserve a linear device id chain
+##
 align_data_partitions()
 {
     local -i length="${#PARTITION_DATA[@]}"
     local -i count=0
+    local -i start=1
+
+    local -a swap_arr
+
+    IFS="," read -r -a swap_arr <<< "${PARTITION_SWAP}"
+
+    if [[ "${swap_arr[2]}" == "partition" ]]; then
+        start=2
+    fi
 
     while :; do
-        local replace="s/^[^,]*,/${count}/g"
+        local replace="s/^[^,]*,/$(( count + start + 1 )),/g"
 
-        PARTITION_DATA="$(printf "${PARTITION_DATA}" | sed "${replace}")"
+        PARTITION_DATA[${count}]="$(printf "%s" "${PARTITION_DATA[${count}]}" | sed "${replace}")"
 
         count=$(( count + 1 ))
 
@@ -320,8 +332,9 @@ align_data_partitions()
 
 create_root_partition()
 {
-    PARTITION_DATA[0]="3,Root Partition,${PARTITION_DEVICE_SIZE_REMAINING},ext4,no,/"
+    PARTITION_DATA[0]="0,Root Partition,${PARTITION_DEVICE_SIZE_REMAINING},ext4,no,/"
     PARTITION_DEVICE_SIZE_REMAINING=0
+    align_data_partitions
 }
 
 create_partition_scheme()
