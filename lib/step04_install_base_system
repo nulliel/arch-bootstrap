@@ -1,0 +1,28 @@
+install_base_system()
+{
+    pacstrap /mnt base base-devel parted gdisk dkms linux-headers efibootmgr intel-ucode ntp net-tools
+
+    local wireless=$(ip link | grep wl | awk '{print $2}' | sed 's/://' | sed '1!d')
+
+    if [[ -n "${wireless}" ]]; then
+        pacstrap /mnt iw wireless_tools wpa_actiond wpa_supplicant dialog
+    else
+        arch_chroot "systemctl enable dhcpcd"
+    fi
+}
+
+configure_keymap()
+{
+    printf "KEYMAP=%s" "${KEYMAP}" > /mnt/etc/vconsole.conf
+}
+
+configure_dns()
+{
+    cat <<- EOF > /etc/resolve.conf.head
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+
+nameserver 2001:4860:4860::8888
+nameserver 2001:4860:4860::8844
+EOF
+}
