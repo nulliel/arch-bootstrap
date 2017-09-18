@@ -18,8 +18,6 @@
 ## OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ## SOFTWARE.
 
-# shellcheck disable=2155
-
 declare -- PARTITION_DEVICE
 
 declare -i PARTITION_DEVICE_SIZE            # Total size of the device
