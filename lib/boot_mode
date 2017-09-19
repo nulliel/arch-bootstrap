@@ -19,59 +19,40 @@
 ## OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ## SOFTWARE.
 
-## Boot Mode
-## 0 - BIOS
-## 1 - UEFI
 UEFI=0
 
-## Return whether the machine is booted in UEFI mode. This is used to enable
-## specific options in the bootstrap script
-##
 is_uefi()
 {
-  if [[ "${UEFI}" -eq 1 ]]; then
-    return 0
-  else
-    return 1
-  fi
+    [[ "${UEFI}" -eq 1 ]] && return 0 || return 1
 }
 
-## Return whether the machine is booted in BIOS mode. If the system is booted
-## in BIOS mode, certain features of the bootstrap script will be unavailaible
-##
 is_bios()
 {
-  if [[ "${UEFI}" -eq 0 ]]; then
-    return 0
-  else
-    return 1
-  fi
+    [[ "${UEFI}" -eq 0 ]] && return 0 || return 1
 }
 
-## Returns the system boot mode. This must be checked as certain features are
-## not availaible in BIOS mode
-##
 get_boot_mode()
 {
-  local vendor
+    local vendor
 
-  vendor="$(cat /sys/class/dmi/id/sys_vendor)"
+    vendor="$(cat /sys/class/dmi/id/sys_vendor)"
 
-  if [[ "${vendor}" == "Apple Inc." || "${vendor}" == "Apple Computer, Inc." ]]; then
-    modprobe -r -q efivars || true
-  else
-    modprobe -q efivarfs
-  fi
-
-  if [[ -d "/sys/firmware/efi" ]]; then
-    if ! mount | grep /sys/firmware/efi/efivars 1>/dev/null 2>&1; then
-      mount -t efivarfs efivarfs /sys/firmware/efi/efivars
+    if [[ "${vendor}" == "Apple Inc." \
+       || "${vendor}" == "Apple Computer, Inc." ]]; then
+        modprobe -r -q efivars || true
+    else
+        modprobe -q efivarfs
     fi
 
-    UEFI=1
-    printf "UEFI Mode detected\n"
-  else
-    UEFI=0
-    printf "BIOS Mode detected\n"
-  fi
+    if [[ -d "/sys/firmware/efi" ]]; then
+        if ! mount | grep /sys/firmware/efi/efivars 1>/dev/null 2>&1; then
+            mount -t efivarfs efivarfs /sys/firmware/efi/efivars
+        fi
+
+        UEFI=1
+        printf "UEFI Mode detected\n"
+    else
+        UEFI=0
+        printf "BIOS Mode detected\n"
+    fi
 }
