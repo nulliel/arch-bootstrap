@@ -44,7 +44,7 @@ SELECTION_PROMPT="Enter your selection: "
 ##
 print_line()
 {
-  printf "%$(tput cols)s\n" | tr ' ' '-'
+    printf "%$(tput cols)s\n" | tr ' ' '-'
 }
 
 ## Print a header on the top of the terminal. This clears the terminal to easily
@@ -52,25 +52,25 @@ print_line()
 ##
 print_title()
 {
-  clear
-  print_line
-  printf "%s%s%s\n" "${FONT_BOLD}" "${1}" "${FONT_RESET}"
-  print_line
-  printf "\n"
+    clear
+    print_line
+    printf "%s%s%s\n" "${FONT_BOLD}" "${1}" "${FONT_RESET}"
+    print_line
+    printf "\n"
 }
 
 ## Print a general message to the terminal
 ##
 print_info()
 {
-  printf "%s%s%s\n\n" "${FONT_BOLD}" "${1}" "${FONT_RESET}" \
-    | fold -sw "$(tput cols)"
+    printf "%s%s%s\n\n" "${FONT_BOLD}" "${1}" "${FONT_RESET}" \
+        | fold -sw "$(tput cols)"
 }
 
 ## Print a yellow warning message to the terminal
 ##
 print_warning()
 {
-  printf "%s%s%s\n" "${FONT_BYELLOW}" "${1}" "${FONT_RESET}" \
-    | fold -sw "$(tput cols)"
+    printf "%s%s%s\n" "${FONT_BYELLOW}" "${1}" "${FONT_RESET}" \
+        | fold -sw "$(tput cols)"
 }

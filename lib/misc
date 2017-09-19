@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 ## Copyright (c) 2017 helmuthdu <helmuthdu@gmail.com>
 ## Copyright (c) 2017 Stephen Ribich <stephen.ribich@gmail.com>
 ##
@@ -19,7 +20,7 @@
 ##
 set_columns()
 {
-  COLUMNS="$(tput cols)"
+    COLUMNS="$(tput cols)"
 }
 
 set_prompt()
@@ -41,32 +42,32 @@ get_input()
 }
 
 confirm () {
-  local confirmString="[y/N]"
+    local confirmString="[y/N]"
 
-  if [[ "${#}" -eq 1 ]]; then
-    confirmString="$1 ${confirmString}"
-  fi
+    if [[ "${#}" -eq 1 ]]; then
+        confirmString="$1 ${confirmString}"
+    fi
 
-  _printHeader
+    _printHeader
 
-  read -rsp "${confirmString}" -n1
-  clearLine
+    read -rsp "${confirmString}" -n1
+    clearLine
 
-  return "$(confirmed)"
+    return "$(confirmed)"
 }
 
 confirmed () {
-  local ret=1
+    local ret=1
 
-  set +o nounset
+    set +o nounset
 
-  if [[ "$REPLY" =~ ^[yY]$ ]]; then
-    unset REPLY
-    ret=0
-  fi
+    if [[ "$REPLY" =~ ^[yY]$ ]]; then
+        unset REPLY
+        ret=0
+    fi
 
-  set -o nounset
-  return "${ret}"
+    set -o nounset
+    return "${ret}"
 }
 
 
@@ -76,16 +77,16 @@ confirmed () {
 ##
 contains_element()
 {
-  local array="$1[@]"
-  local seeking="${2}"
-  local found=1
+    local array="$1[@]"
+    local seeking="${2}"
+    local found=1
 
-  for element in "${!array}"; do
-    if [[ "${element}" == "${seeking}" ]]; then
-      found=0
-      break
-    fi
-  done
+    for element in "${!array}"; do
+        if [[ "${element}" == "${seeking}" ]]; then
+            found=0
+            break
+        fi
+    done
 
-  return "${found}"
+    return "${found}"
 }

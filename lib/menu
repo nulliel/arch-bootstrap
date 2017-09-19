@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 ## Copyright (c) 2017 helmuthdu <helmuthdu@gmail.com>
 ## Copyright (c) 2017 Stephen Ribich <stephen.ribich@gmail.com>
 ##
@@ -21,16 +22,16 @@ checklist=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 ##
 checkbox()
 {
-  if [[ "${1}" -eq 1 ]]; then
-    printf "%s[%s%sx%s]%s\n" \
-           "${FONT_BBLUE}"   \
-           "${FONT_RESET}"   \
-           "${FONT_BOLD}"    \
-           "${FONT_BBLUE}"   \
-           "${FONT_RESET}"
-  else
-    printf "%s[ ]%s\n" "${FONT_BBLUE}" "${FONT_RESET}"
-  fi
+    if [[ "${1}" -eq 1 ]]; then
+        printf "%s[%s%sx%s]%s\n" \
+               "${FONT_BBLUE}"   \
+               "${FONT_RESET}"   \
+               "${FONT_BOLD}"    \
+               "${FONT_BBLUE}"   \
+               "${FONT_RESET}"
+    else
+        printf "%s[ ]%s\n" "${FONT_BBLUE}" "${FONT_RESET}"
+    fi
 }
 
 ## Print a menu item in the following format:
@@ -38,16 +39,16 @@ checkbox()
 ##
 mainmenu_item()
 {
-  local state
+    local state
 
-  if [[ "$1" -eq 1 && "$3" != "" ]]; then
-    state="${FONT_BGREEN}[${FONT_RESET}${3}${FONT_BGREEN}]${FONT_RESET}"
-  fi
+    if [[ "$1" -eq 1 && "$3" != "" ]]; then
+        state="${FONT_BGREEN}[${FONT_RESET}${3}${FONT_BGREEN}]${FONT_RESET}"
+    fi
 
-  printf "%s %s%s%s %s"     \
-         "$(checkbox "$1")" \
-         "${FONT_BOLD}"     \
-         "${2}"             \
-         "${FONT_RESET}"    \
-         "${state}"
+    printf "%s %s%s%s %s"     \
+           "$(checkbox "$1")" \
+           "${FONT_BOLD}"     \
+           "${2}"             \
+           "${FONT_RESET}"    \
+           "${state}"
 }
