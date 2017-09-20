@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 ## Copyright (c) 2017 helmuthdu <helmuthdu@gmail.com>
 ## Copyright (c) 2017 Stephen Ribich <stephen.ribich@gmail.com>
 ##
@@ -14,6 +15,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+declare -- KEYMAP
+
 ## Set the system locale and keyboard layout settings for both the virtual console and Xorg using
 ## the localectl tool
 ##
@@ -21,30 +24,28 @@
 ##
 select_keymap()
 {
-  local title
-  local info
-  local keymap_list
+    local -- title="KEYMAP - Keyboard Configuration"
+    local -- info="Set the system locale and keyboard layout settings for the virtual console and Xorg using the localectl tool"
 
-  title="KEYMAP - Keyboard Configuration"
-  info="Set the system locale and keyboard layout settings for both the virtual console and Xorg using the localectl tool"
+    local -a keymap_list
 
-  keymap_list=( $(localectl list-keymaps | tr '\n' ' ') )
+    keymap_list=( $(localectl list-keymaps | tr '\n' ' ') )
 
-  print_title "${title}"
-  print_info "${info}"
+    print_title "${title}"
+    print_info "${info}"
 
-  PS3="${SELECTION_PROMPT}"
+    set_columns
+    set_prompt
 
-  set_columns
+    select KEYMAP in "${keymap_list[@]}"; do
+        if contains_element keymap_list "${KEYMAP}"; then
+            localectl set-keymap --no-convert "${KEYMAP}"
+            break
+        else
+            invalid_option
 
-  select KEYMAP in "${keymap_list[@]}"; do
-    if contains_element keymap_list "${KEYMAP}"; then
-      localectl set-keymap --no-convert "${KEYMAP}"
-      break
-    else
-      invalid_option
-      print_title "${title}"
-      print_info "${info}"
-    fi
-  done
+            print_title "${title}"
+            print_info "${info}"
+        fi
+    done
 }
