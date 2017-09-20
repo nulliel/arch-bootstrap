@@ -42,7 +42,7 @@ configure()
     get_boot_mode
 
     if is_bios; then
-        printf "BIOS mode is not currently supported for this script\n"
+        print_warning "BIOS mode is not currently supported in this script"
         exit 1
     fi
 
@@ -153,7 +153,7 @@ print_options()
 }
 
 ################################################################################
-##
+## Main
 ################################################################################
 main()
 {
