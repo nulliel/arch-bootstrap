@@ -17,8 +17,8 @@
 
 export declare -- KEYMAP
 
-## Set the system locale and keyboard layout settings for both the virtual console and Xorg using
-## the localectl tool
+## Set the system locale and keyboard layout settings for both the virtual
+## console and Xorg using the localectl tool
 ##
 ## https://wiki.archlinux.org/index.php/keymap
 ##
