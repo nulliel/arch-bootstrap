@@ -23,10 +23,11 @@ checklist=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 checkbox()
 {
     if [[ "${1}" -eq 1 ]]; then
-        printf "%s[%s%sx%s]%s\n" \
+        printf "%s[%s%sx%s%s]%s\n" \
                "${FONT_BBLUE}"   \
                "${FONT_RESET}"   \
                "${FONT_BOLD}"    \
+               "${FONT_RESET}"   \
                "${FONT_BBLUE}"   \
                "${FONT_RESET}"
     else
