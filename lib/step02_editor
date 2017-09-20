@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 ## Copyright (c) 2017 helmuthdu <helmuthdu@gmail.com>
 ## Copyright (c) 2017 Stephen Ribich <stephen.ribich@gmail.com>
 ##
@@ -14,33 +15,19 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-## Set the default system editor
-##
+export declare -- EDITOR
+
 select_editor()
 {
-  local title
-  local info
-  local editor_list
+  local -- title="EDITOR - Editor Configuration"
+  local -- info="Select editor"
 
-  title="EDITOR - Editor Configuration"
-  info="Set the default system editor"
-
-  editor_list=("vi" "vim" "nano")
+  local -a editor_list=("vi" "vim" "nano")
 
   print_title "${title}"
-  print_info "${info}"
 
-  PS3="${SELECTION_PROMPT}"
+  selection "${info}" \
+            "${editor_list[@]}"
 
-  set_columns
-
-  select EDITOR in "${editor_list[@]}"; do
-    if contains_element editor_list "${EDITOR}"; then
-      break
-    else
-      invalid_option
-      print_title "${title}"
-      print_info "${info}"
-    fi
-  done
+  EDITOR="${SELECTION_VALUE}"
 }
