@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-declare -- KEYMAP
+export declare -- KEYMAP
 
 ## Set the system locale and keyboard layout settings for both the virtual console and Xorg using
 ## the localectl tool
