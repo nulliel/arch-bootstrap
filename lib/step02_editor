@@ -19,14 +19,11 @@ export declare -- EDITOR
 
 select_editor()
 {
-  local -- title="EDITOR - Editor Configuration"
-  local -- info="Select editor"
-
   local -a editor_list=("vi" "vim" "nano")
 
-  print_title "${title}"
+  print_title "EDITOR - Editor Configuration"
 
-  selection "${info}" \
+  selection "Select editor" \
             "${editor_list[@]}"
 
   EDITOR="${SELECTION_VALUE}"
