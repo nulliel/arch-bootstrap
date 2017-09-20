@@ -41,9 +41,9 @@ check_connection()
     local wired_dev
     local wireless_dev
 
-    wired_dev=$(ip link                        \
-                    | grep '^[0-9].*en.*:'     \
-                    | awk 'NR==1 { print $2 }' \
+    wired_dev=$(ip link                           \
+                    | grep '^[0-9].*en.*:'        \
+                    | awk 'NR==1 { print $2 }'    \
                     | sed 's/://')
     wireless_dev=$(ip link                        \
                        | grep '^[0-9].*wl.*:'     \
