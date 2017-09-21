@@ -31,7 +31,7 @@ source "./lib/step01_keymap"
 source "./lib/step02_editor"
 source "./lib/step03_partition_disk"
 
-SCRIPT_TITLE="Arch Bootstrap"
+declare -- SCRIPT_TITLE="Arch Bootstrap"
 
 ################################################################################
 ## Script Configuration
