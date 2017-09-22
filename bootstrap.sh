@@ -15,7 +15,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-cd "$(dirname "$(readlink -f "$0" || realpath "$0")")" || :
+## Start the script by changing the directory of the current shell to the proper
+## directory. This lets path resolution work properly
+##
+cd "$(dirname "$(readlink -f "$0" || realpath "$0")")" || exit
 
 source "./lib/util/print"
 source "./lib/util/menu"
