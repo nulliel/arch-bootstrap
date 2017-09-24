@@ -25,11 +25,13 @@ export declare -- KEYMAP
 select_keymap()
 {
     local -- title="KEYMAP - Keyboard Configuration"
-    local -- info="Set the system locale and keyboard layout settings for the virtual console and Xorg using the localectl tool"
+    local -- info="Select the system locale and keyboard layout"
 
     local -a keymap_list
 
-    keymap_list=( $(localectl list-keymaps | tr '\n' ' ') )
+    keymap_list=(
+        $(localectl list-keymaps | tr '\n' ' ')
+    )
 
     print_title "${title}"
     print_info "${info}"
@@ -40,6 +42,7 @@ select_keymap()
     select KEYMAP in "${keymap_list[@]}"; do
         if contains_element keymap_list "${KEYMAP}"; then
             localectl set-keymap --no-convert "${KEYMAP}"
+            localectl set-x11-keymap --no-convert "${KEYMAP}"
             break
         else
             invalid_option
