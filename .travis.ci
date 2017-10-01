@@ -1,0 +1,11 @@
+language: bash
+
+sudo: required
+
+before_script:
+  sudo apt-get install shellcheck
+  git submodule update --init --recursive
+
+script:
+  shellcheck ./bootstrap.sh ./lib/**/*
+  ./test.sh
