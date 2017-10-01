@@ -7,5 +7,5 @@ before_script:
   - git submodule update --init --recursive
 
 script:
-  - shellcheck ./bootstrap.sh ./lib/**/*
+  - shellcheck -x ./bootstrap.sh ./lib/**/*
   - ./test.sh
