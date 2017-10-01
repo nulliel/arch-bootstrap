@@ -38,6 +38,11 @@ build_path()
 main()
 {
     build_path
+
+    if [[ "${#bats_args[@]}" -eq 0 ]]; then
+        return 1
+    fi
+
     ./test/test_helper/bats/bin/bats ${bats_args[@]}
 }
 
