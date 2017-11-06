@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+## Copyright (c) 2017 helmuthdu <helmuthdu@gmail.com>
+## Copyright (c) 2017 Stephen Ribich <stephen.ribich@gmail.com>
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+export declare -- BOOTLOADER
+
+## https://wiki.archlinux.org/index.php/Category:Boot_loaders
+##
+select_bootloader()
+{
+    local -a bootloader_list=()
+
+    print_title "BOOTLOADER - Select Bootloader"
+    print_info "In order to boot Arch Linux, a Linux-capable boot loader must be installed to the Master Boot Record or the GUID Partition Table. It is the first piece of software started by the BIOS or UEFI. It is responsible for loading the kernel with the wanted kernel parameters, and initial RAM disk before initiating the boot process"
+
+
+    if is_uefi; then
+        print_warning "UEFI Mode Detected"
+        bootloader_list=("rEFInd" "Syslinux" "GRUB")
+    else
+        print_warning "BIOS Mode Detected"
+        bootloader_list=("Syslinux" "GRUB")
+    fi
+
+    printf "\n"
+
+    selection "Select a Bootloader" \
+              "${bootloader_list[@]}"
+
+    case "${SELECTION_VALUE}" in
+        "rEFInd")
+            pacstrap "${PARTITION_MOUNT}" refind-efi os-prober
+            ;;
+        "Syslinux")
+            pacstrap "${PARTITION_MOUNT}" syslinux gptfdisk
+            ;;
+        "GRUB")
+            pacstrap "${PARTITION_MOUNT}" grub os-prober
+            ;;
+    esac
+
+    pacstrap "${PARTITION_MOUNT}" efibootmgr dosfstools
+
+    if lscpu | grep "Vendor ID.*Intel"; then
+        pacstrap "${PARTITION_MOUNT}" intel-ucode
+    fi
+
+    BOOTLOADER="${SELECTION_VALUE}"
+}
+
+##
+##
+configure_bootloader()
+{
+    print_title "BOOTLOADER - Configure Bootloader"
+
+    case "${BOOTLOADER}" in
+        "rEFInd")
+            configure_refind
+            ;;
+        "Syslinux")
+            configure_syslinux
+            ;;
+        "GRUB")
+            configure_grub
+            ;;
+    esac
+}
+
+## https://wiki.archlinux.org/index.php/REFInd
+##
+configure_refind()
+{
+    print_info "rEFInd is a UEFI boot manager capable of launching EFISTUB kernels. It is a fork of the no-longer maintained rEFIt and fixes many issues with respect to non-Mac UEFI booting. It is designed to be platform-neutral and to simplify booting multiple OSes"
+}
+
+configure_syslinux()
+{
+    print_info "Syslinux is a collection of bootloaders capable of booting from drives, CDs, and over the network via PXE. Some of the supported file systems are FAT, ext2, ext3, ext4, and uncompressed single-device Btrfs"
+}
+
+configure_grub()
+{
+    print_info "GRUB is the next generation of the GRand Unified Bootloader. GRUB is derived from PUPA which was a research project to develop the next generation of what is now GRUB Legacy. GRUB has been rewritten from scratch to clean up everything and provide modularity and portability"
+}
+
+install_bootloader()
+{
+    select_bootloader
+    sleep 10
+    # configure_bootloader
+}

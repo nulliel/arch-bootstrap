@@ -12,3 +12,6 @@
 * TODO Make create_partition_scheme have an option for configuring LUKS
 
 * TODO Enable set -e and fix issues
+
+* TODO Add skip option for bootloader
+* TODO Add testing option to prevent installing and other things

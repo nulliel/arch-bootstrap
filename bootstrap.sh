@@ -26,6 +26,7 @@ source "./lib/util/device"
 source "./lib/util/control_flow"
 source "./lib/util/misc"
 source "./lib/util/selection"
+source "./lib/util/system"
 
 source "./lib/boot_mode"
 source "./lib/connection"
@@ -33,6 +34,12 @@ source "./lib/connection"
 source "./lib/step01_keymap"
 source "./lib/step02_editor"
 source "./lib/step03_partition_disk"
+source "./lib/step11_install_bootloader"
+source "./lib/step12_root_password"
+
+################################################################################
+## Definitions
+################################################################################
 
 declare -- SCRIPT_TITLE="Arch Bootstrap"
 
@@ -42,19 +49,24 @@ declare -- SCRIPT_TITLE="Arch Bootstrap"
 
 configure()
 {
-    get_boot_mode
-
-    if is_bios; then
-        print_warning "BIOS mode is not currently supported in this script"
+    if ! ifndev grep "archiso" "/etc/hostname"; then
+        print_warning "This script will only run from an Arch Linux live image"
         exit 1
     fi
 
+    get_boot_mode
     check_connection
 }
 
-sync()
+finish()
 {
-    pacman -Sy
+    print_title "Install Completed"
+
+    if confirm "Reboot?"; then
+        reboot
+    fi
+
+    exit 0
 }
 
 ################################################################################
@@ -109,7 +121,7 @@ print_menu()
                              "")"
     printf "12) %s\n" "$(mainmenu_item                  \
                              "${checklist[12]}"         \
-                             "Root Password"            \
+                             "Configure Root Password"  \
                              "")"
 
     printf "\n"
@@ -146,6 +158,14 @@ print_options()
             configure_fstab
             checklist[5]=1
             ;;
+        11)
+            install_bootloader
+            checklist[11]=1
+            ;;
+        12)
+            configure_root_password
+            checklist[12]=1
+            ;;
         d)
             finish
             ;;
@@ -162,6 +182,7 @@ main()
 {
     print_title "${SCRIPT_TITLE}"
 
+    prepare
     configure
     sync
 

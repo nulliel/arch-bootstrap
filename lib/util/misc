@@ -48,12 +48,10 @@ confirm () {
         confirmString="$1 ${confirmString}"
     fi
 
-    _printHeader
-
     read -rsp "${confirmString}" -n1
-    clearLine
+    printf "\r\033[K"
 
-    return "$(confirmed)"
+    return $(confirmed)
 }
 
 confirmed () {
