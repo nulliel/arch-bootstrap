@@ -18,15 +18,7 @@
 ## Set the number of columns availaible. Select statements will format according
 ## to the number of columns set, and this variable is not always set
 ##
-set_columns()
-{
-    COLUMNS="$(tput cols)"
-}
 
-set_prompt()
-{
-    PS3="${SELECTION_PROMPT}"
-}
 
 ##
 ##

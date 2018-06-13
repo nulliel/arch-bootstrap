@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+
 ## Copyright (c) 2017 helmuthdu <helmuthdu@gmail.com>
-## Copyright (c) 2017 Stephen Ribich <stephen.ribich@gmail.com>
+## Copyright (c) 2018 Stephen Ribich <stephen.ribich@gmail.com>
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -22,10 +23,10 @@ test_connection()
     local ip
 
     ip=$(ip route             \
-             | grep 'default' \
+             | grep "default" \
              | awk 'NR==1 { print $3 }')
 
-    if ! ping -q -w 1 -c 1 "${ip}" 1>/dev/null 2>&1; then
+    if ! sudo ping -q -w 1 -c 1 "${ip}" 1>/dev/null 2>&1; then
         return 1
     fi
 
@@ -79,8 +80,8 @@ check_connection()
             ip route add default via "${gateway}"
             ;;
         "Wireless")
-            ip link set "${wireless_dev}" up
-            wifi-menu "${wireless_dev}"
+            sudo ip link set "${wireless_dev}" up
+            sudo wifi-menu "${wireless_dev}"
             ;;
     esac
 

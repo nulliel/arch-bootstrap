@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+
 ## Copyright (c) 2017 helmuthdu <helmuthdu@gmail.com>
-## Copyright (c) 2017 Stephen Ribich <stephen.ribich@gmail.com>
+## Copyright (c) 2018 Stephen Ribich <stephen.ribich@gmail.com>
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -15,7 +16,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# Attributes
+################################################################################## Message Attributes
+################################################################################
+
 FONT_BOLD="$(tput bold)"
 FONT_RESET="$(tput sgr0)"
 
@@ -29,48 +32,110 @@ FONT_CYAN="$(tput setaf 6)"
 FONT_WHITE="$(tput setaf 7)"
 
 # Bold Colors
-FONT_BRED="${_BOLD}${_RED}"
-FONT_BGREEN="${_BOLD}${_GREEN}"
+FONT_BRED="${FONT_BOLD}${FONT_RED}"
+FONT_BGREEN="${FONT_BOLD}${FONT_GREEN}"
 FONT_BYELLOW="${FONT_BOLD}${FONT_YELLOW}"
-FONT_BBLUE="${_BOLD}${_BLUE}"
-FONT_BPURPLE="${_BOLD}${_PURPLE}"
-FONT_BCYAN="${_BOLD}${_CYAN}"
-FONT_BWHITE="${_BOLD}${_WHITE}"
+FONT_BBLUE="${FONT_BOLD}${FONT_BLUE}"
+FONT_BPURPLE="${FONT_BOLD}${FONT_PURPLE}"
+FONT_BCYAN="${FONT_BOLD}${FONT_CYAN}"
+FONT_BWHITE="${FONT_BOLD}${FONT_WHITE}"
 
 # Prompts
 SELECTION_PROMPT="Enter your selection: "
 
-## Print a horizontal rule of the character "-"
+################################################################################## Terminal Normalization
+################################################################################
+
+## Set the console width to the maximum available to the terminal.
 ##
-print_line()
+set_columns()
 {
-    printf "%$(tput cols)s\n" | tr ' ' '-'
+    COLUMNS="$(tput cols)"
 }
 
-## Print a header on the top of the terminal. This clears the terminal to easily
-## get a position on the top of the terminal
+################################################################################## Message Headers
+################################################################################
+
+## Print a header on top of the terminal. This clears the terminal to easily
+## get a position on the top of the terminal.
+##
+## $1 - Text to print
 ##
 print_title()
 {
     clear
     print_line
-    printf "%s%s%s\n" "${FONT_BOLD}" "${1}" "${FONT_RESET}"
+    printf "%s%s%s\n"      \
+           "${FONT_BOLD}"  \
+           "${1}"          \
+           "${FONT_RESET}" \
+        | fold -sw "$(tput cols)"
     print_line
     printf "\n"
 }
 
-## Print a general message to the terminal
+## Print a horizontal rule of the character - that fills the console.
+##
+print_line()
+{
+    printf "%$(tput cols)s\n" | tr " " "-"
+}
+
+################################################################################
+## Message Types
+################################################################################
+
+## Print a bold message to the terminal.
+##
+## $1 - Text to print.
 ##
 print_info()
 {
-    printf "%s%s%s\n\n" "${FONT_BOLD}" "${1}" "${FONT_RESET}" \
+    printf "%s%s%s\n"      \
+           "${FONT_BOLD}"  \
+           "${1}"          \
+           "${FONT_RESET}" \
         | fold -sw "$(tput cols)"
 }
 
-## Print a yellow warning message to the terminal
+## Print a bold yellow warning message to the terminal.
+##
+## $1 - Text to print.
 ##
 print_warning()
 {
-    printf "%s%s%s\n" "${FONT_BYELLOW}" "${1}" "${FONT_RESET}" \
+    printf "%s%s%s\n"        \
+           "${FONT_BYELLOW}" \
+           "${1}"            \
+           "${FONT_RESET}"   \
         | fold -sw "$(tput cols)"
+}
+
+## Print a bold red error message to the terminal.
+##
+## $1 - Text to print.
+##
+print_error()
+{
+    printf "%s%s%s\n"      \
+           "${FONT_BRED}"  \
+           "${1}"          \
+           "${FONT_RESET}" \
+        | fold -sw "$(tput cols)"
+}
+
+################################################################################## Prompts
+################################################################################
+
+## Set the prompt to $1 or to the default selection prompt.
+##
+## $1 - Prompt to set
+##
+set_prompt()
+{
+    PS3="${SELECTION_PROMPT}"
+
+    if [[ "$#" -ge 1 ]]; then
+        PS3="${1}"
+    fi
 }

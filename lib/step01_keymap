@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 ## Copyright (c) 2017 helmuthdu <helmuthdu@gmail.com>
 ## Copyright (c) 2017 Stephen Ribich <stephen.ribich@gmail.com>
 ##
@@ -15,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-export declare -- KEYMAP
+declare -x KEYMAP
 
 ## Set the system locale and keyboard layout settings for both the virtual
 ## console and Xorg using the localectl tool
@@ -24,12 +25,10 @@ export declare -- KEYMAP
 ##
 select_keymap()
 {
-    local -- title="KEYMAP - Keyboard Configuration"
-    local -- info="Select the system locale and keyboard layout"
+    local title="KEYMAP - Keyboard Configuration"
+    local info="Select the system locale and keyboard layout"
 
-    local -a keymap_list
-
-    keymap_list=(
+    local -a keymap_list=(
         $(localectl list-keymaps | tr '\n' ' ')
     )
 

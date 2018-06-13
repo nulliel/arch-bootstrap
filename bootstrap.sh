@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 ## Copyright (c) 2017 helmuthdu <helmuthdu@gmail.com>
 ## Copyright (c) 2017 Stephen Ribich <stephen.ribich@gmail.com>
 ##
@@ -15,9 +16,22 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-## Start the script by changing the directory of the current shell to the proper
-## directory. This lets path resolution work properly
-##
+################################################################################## Debugging
+################################################################################
+export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+
+set -e
+
+if [[ -n "${DEBUG}" ]]; then
+    set -o verbose # set -v
+    set -o xtrace  # set -x
+fi
+
+################################################################################## Imports
+################################################################################
+## When scripts are executed, they run under the directory in which they
+## were called. This command remedies that by changing the directory to the
+## folder in which the executed file resides.
 cd "$(dirname "$(readlink -f "$0" || realpath "$0")")" || exit
 
 source "./lib/util/print"
@@ -37,20 +51,14 @@ source "./lib/step03_partition_disk"
 source "./lib/step11_install_bootloader"
 source "./lib/step12_root_password"
 
-################################################################################
-## Definitions
-################################################################################
-
-declare -- SCRIPT_TITLE="Arch Bootstrap"
-
-################################################################################
-## Script Configuration
+################################################################################## Script Configuration
 ################################################################################
 
 configure()
 {
-    if ! ifndev grep "archiso" "/etc/hostname"; then
-        print_warning "This script will only run from an Arch Linux live image"
+    if [[ "${SKIP_ARCHISO_CHECK}" -ne 1 ]] && \
+           ! ifndev grep "archiso" "/etc/hostname" 1>/dev/null 2>&1; then
+        print_error "This script will only run from an Arch Linux live image"
         exit 1
     fi
 
@@ -175,19 +183,17 @@ print_options()
     esac
 }
 
+################################################################################## Main
 ################################################################################
-## Main
-################################################################################
+
 main()
 {
-    print_title "${SCRIPT_TITLE}"
+    print_title "Arch Bootstrap"
 
-    prepare
     configure
-    sync
 
     while :; do
-        print_title "${SCRIPT_TITLE}"
+        print_title "Arch Bootstrap"
 
         print_menu
         print_options
@@ -195,3 +201,5 @@ main()
 }
 
 main "$@"
+
+exit
