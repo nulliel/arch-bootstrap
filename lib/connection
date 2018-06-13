@@ -80,8 +80,7 @@ check_connection()
             ip route add default via "${gateway}"
             ;;
         "Wireless")
-            sudo ip link set "${wireless_dev}" up
-            sudo wifi-menu "${wireless_dev}"
+            wifi-menu "${wireless_dev}"
             ;;
     esac
 

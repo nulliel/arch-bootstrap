@@ -15,20 +15,17 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# shellcheck disable=2155
-
 declare PARTITION_DEVICE
 declare PARTITION_MOUNT
 
-
-## PARTITION_LIST is a structure for creating partitions
+## PARTITION_LIST is a structure for creating partitions.
 ## The structure is as follows:
 ##
-##   ID,Size,Filesystem,Mountpoint,Name,Encrypt,Swap,Modify
+##   ID,Sie,Filesystem,Mountpoint,Name,Encrypt,Swap,Modify
 ##
 ## ID         (Device ID)
 ## Size       (Partition Size)       []
-## Filesystem (Partition Filesystem) [ext2,ex3,ext4,btrfs,fat32,vfat]
+## Filesystem (Partition Filesystem) [ext2,ext3,ext4,btrfs.fat32.vfat]
 ## Mountpoint (Partition Mountpoint) [string]
 ## Name       (Partition Name)       [string]
 ## Encrypt    (Partition Encryption) []
@@ -38,8 +35,6 @@ declare PARTITION_MOUNT
 ## Note: This structure is an array
 ##
 declare PARTITION_LIST
-
-
 
 PARTITION_DEVICE_TRIM=0
 
@@ -215,7 +210,7 @@ show_devices()
     local device_str
 
     device_arr=(
-        $(grep "sd\|nvme" "/proc/devices" | awk '{ print $1 }')
+        $(grep "sd\|nvme\|blkext" "/proc/devices" | awk '{ print $1 }')
     )
 
     device_str="$(printf "%s" "${device_arr[*]}" | tr ' ' ',')"
@@ -721,13 +716,16 @@ mount_partitions()
     mount "${PARTITION_MOUNT}1" /mnt/boot
 }
 
-
 ################################################################################
 ## Formatting & Mounting
 ################################################################################
 
 partition_disk()
 {
+#    local partition_layouts=("Default" "LVM")
+#    print_title "Partition Layout"
+#    selection "Select a partition scheme:" "${partition_layouts[@]}"
+
     select_device
 
     umount_partitions
