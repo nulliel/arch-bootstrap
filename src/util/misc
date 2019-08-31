@@ -65,18 +65,4 @@ confirmed () {
 
 ## Check whether an array ($1) contains an element ($2)
 ##
-contains_element()
-{
-    local array="$1[@]"
-    local seeking="${2}"
-    local found=1
 
-    for element in "${!array}"; do
-        if [[ "${element}" == "${seeking}" ]]; then
-            found=0
-            break
-        fi
-    done
-
-    return "${found}"
-}

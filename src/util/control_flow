@@ -44,7 +44,7 @@ invalid_option()
 ##
 ifndev()
 {
-    if [[ "${DEVELOPMENT}" -eq 1 ]]; then
+    if [[ "${DEVELOPMENT:-0}" -eq 1 ]]; then
         return 0
     fi
 

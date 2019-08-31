@@ -41,7 +41,7 @@ FONT_BCYAN="${FONT_BOLD}${FONT_CYAN}"
 FONT_BWHITE="${FONT_BOLD}${FONT_WHITE}"
 
 # Prompts
-SELECTION_PROMPT="Enter your selection: "
+
 
 ################################################################################## Terminal Normalization
 ################################################################################
@@ -53,89 +53,15 @@ set_columns()
     COLUMNS="$(tput cols)"
 }
 
-################################################################################## Message Headers
-################################################################################
 
-## Print a header on top of the terminal. This clears the terminal to easily
-## get a position on the top of the terminal.
-##
-## $1 - Text to print
-##
-print_title()
-{
-    clear
-    print_line
-    printf "%s%s%s\n"      \
-           "${FONT_BOLD}"  \
-           "${1}"          \
-           "${FONT_RESET}" \
-        | fold -sw "$(tput cols)"
-    print_line
-    printf "\n"
-}
 
-## Print a horizontal rule of the character - that fills the console.
-##
-print_line()
-{
-    printf "%$(tput cols)s\n" | tr " " "-"
-}
+
+
+
 
 ################################################################################
 ## Message Types
 ################################################################################
 
-## Print a bold message to the terminal.
-##
-## $1 - Text to print.
-##
-print_info()
-{
-    printf "%s%s%s\n"      \
-           "${FONT_BOLD}"  \
-           "${1}"          \
-           "${FONT_RESET}" \
-        | fold -sw "$(tput cols)"
-}
 
-## Print a bold yellow warning message to the terminal.
-##
-## $1 - Text to print.
-##
-print_warning()
-{
-    printf "%s%s%s\n"        \
-           "${FONT_BYELLOW}" \
-           "${1}"            \
-           "${FONT_RESET}"   \
-        | fold -sw "$(tput cols)"
-}
 
-## Print a bold red error message to the terminal.
-##
-## $1 - Text to print.
-##
-print_error()
-{
-    printf "%s%s%s\n"      \
-           "${FONT_BRED}"  \
-           "${1}"          \
-           "${FONT_RESET}" \
-        | fold -sw "$(tput cols)"
-}
-
-################################################################################## Prompts
-################################################################################
-
-## Set the prompt to $1 or to the default selection prompt.
-##
-## $1 - Prompt to set
-##
-set_prompt()
-{
-    PS3="${SELECTION_PROMPT}"
-
-    if [[ "$#" -ge 1 ]]; then
-        PS3="${1}"
-    fi
-}

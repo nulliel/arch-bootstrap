@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+declare -x KEYMAP=""
+
+##
+# Sets the system locale and keyboard layout settings for both
+# the virtual console and Xorg using the localectl tool
+#
+# https://wiki.archlinux.org/index.php/keymap
+##
+select_keymap()
+{
+    local title="KEYMAP - Keyboard Configuration"
+    local info="Select the system locale and keyboard layout"
+
+    mapfile -t keymap_list < <(localectl list-keymaps)
+
+    print.title "${title}"
+    print.info  "${info}"
+
+    print.set_prompt
+
+    select KEYMAP in "${keymap_list[@]}"; do
+        if array.contains "keymap_list" "${KEYMAP}"; then
+            localectl set-keymap --no-convert "${KEYMAP}"
+            localectl set-x11-keymap --no-convert "${KEYMAP}"
+            break
+        else
+            invalid_option
+
+            print.title "${title}"
+            print.info  "${info}"
+        fi
+    done
+}

@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+## Determines the boot mode of the system.
+##
+## Certain functionality is dependant upon whether UEFI is available
+## to us.
+##
+## UEFI:
+##
+##
+
+declare -i UEFI=0
+
+is_uefi() {
+    [[ "${UEFI}" -eq 0 ]] && return 0 || return 1
+}
+
+is_bios()
+{
+    [[ "${UEFI}" -eq 1 ]] && return 0 || return 1
+}
+
+##
+# Determines whether the system has been booted in UEFO or BIOS
+# mode
+##
+get_boot_mode()
+{
+    load_efivars
+
+    if [[ -d "/sys/firmware/efi" ]]; then
+        mount_efivars
+
+        UEFI=0
+        print.info "UEFI mode detected"
+    else
+        UEFI=1
+        print.info "BIOS mode detected"
+    fi
+
+    readonly UEFI
+}
+
+##
+# Gives the kernel access to efivars
+#
+# If efivars is not automatically loaded into the kernel by
+# systemd during boot them it must be manually loaded to give
+# the kernel access to the EFI variables stored in NVRAM
+##
+load_efivars()
+{
+    local vendor="$(cat /sys/class/dmi/id/sys_vendor)"
+
+    if [[ "${vendor}" =~ "Apple" ]]; then
+        modprobe -r -q efivars || :
+    else
+        modprobe -q efivars || :
+    fi
+}
+
+##
+# Mounts efivars
+#
+# If efivars is not automatically mounted by systemd during boot
+# then it must be mounted manually to expose EFI variables to
+# tools such as uefibootmgr.
+#
+# efivars MUST be mounted at /sys/firmware/efi/efivars
+##
+mount_efivars()
+{
+    local mountpoint="/sys/firmware/efi/efivars"
+
+    if ! mount | grep "${mountpoint}" 1>/dev/null 2>&1; then
+        mount -t efivars efivars "${mountpoint}"
+    fi
+}
