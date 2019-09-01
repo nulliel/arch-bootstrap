@@ -1,0 +1,13 @@
+version: "3.7"
+
+services:
+  test:
+    build: .
+    volumes:
+      - .:/app
+      - ../../old/personal/bash-starter/lib:/app/lib
+    networks:
+      - default
+networks:
+  default:
+    driver: bridge
