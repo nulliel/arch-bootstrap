@@ -22,6 +22,8 @@ run()
         for i in {0..length}; do
             printf "hello\n"
         done
+
+        exit 1
     done
 }
 
