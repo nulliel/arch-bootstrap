@@ -40,6 +40,7 @@ run()
         done
 
         printf " d) done\n"
+
     done
 }
 
@@ -179,7 +180,7 @@ checkbox()
 ## Print a menu item in the following format:
 ##   [ ] text [state]
 ##
-item()
+mainmenu_item()
 {
     local state=""
 
@@ -188,7 +189,7 @@ item()
     fi
 
     printf "%s %s%s%s %s"     \
-           "$(menu.checkbox "$1")" \
+           "$(checkbox "$1")" \
            "${FONT_BOLD}"     \
            "${2}"             \
            "${FONT_RESET}"    \
