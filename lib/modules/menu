@@ -5,25 +5,37 @@ run()
 {
     local length="${#}"
     local items=()
-    local checks=
+
+    local init=""
 
     if [[ $((length % 2)) -ne 0 ]]; then
-        # TODO: Throw
-        print.error "Expected an even number of arguments"
+        init="$1"
+        shift
     fi
 
     length=$((length / 2))
 
+    i=0
     while [[ "${#}" -ne 0 ]]; do
-        # items[0]=("${1}" "${2}")
+        varname="menu_$i_${RANDOM}"
+        items["${i}"]="$varname"
+
+        declare -An list="${varname}"
+        list=("${1}" "${2}")
+
+        i=$((i + 1))
         shift
         shift
     done
 
     while :; do
+        "$init"
+
         for i in $(seq 1 "${length}"); do
             printf " %i) %s\n" "${i}" "test"
         done
+
+        printf " d) done\n"
 
         exit 1
     done
