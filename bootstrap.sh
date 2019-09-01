@@ -9,6 +9,7 @@ fi
 activate_module array
 activate_module runtime
 activate_module selection
+activate_module menu
 
 ###############################################################################
 ## Imports
@@ -71,6 +72,12 @@ main()
     print.title "Arch Bootstrap"
 
     bootstrap::configure
+
+    menu.run \
+        "Select Keymap" "KEYMAP" \
+        "Select Editor" "EDITOR"
+
+exit 0
 
     while :; do
         print.title "Arch Bootstrap"
