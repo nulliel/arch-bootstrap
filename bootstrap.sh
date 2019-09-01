@@ -46,8 +46,8 @@ bootstrap::configure()
         exit 1
     }
 
-    get_boot_mode
-    check_connection
+    # get_boot_mode
+    # check_connection
 }
 
 finish()
