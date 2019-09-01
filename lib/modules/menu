@@ -13,7 +13,7 @@ run()
     fi
 
     while [[ "${#}" -ne 0 ]]; do
-        items[0]=("${1}" "${2}")
+        # items[0]=("${1}" "${2}")
         shift
         shift
     done
