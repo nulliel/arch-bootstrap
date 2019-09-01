@@ -38,6 +38,7 @@ run()
             local arr="${items[$(( i - 1 ))]}"
             declare -n list="$arr"
 
+
             printf " %i) %s\n" "${i}" "$(menu.item "${list[3]}" "${list[0]}" "${list[1]}")"
         done
 
@@ -59,6 +60,7 @@ run()
                 declare -n list="$arr"
 
                 "${list[2]}"
+                list[3]=1
         esac
 
     done
