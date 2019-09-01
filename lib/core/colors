@@ -101,24 +101,24 @@ set_symbols()
         FONT_Saxophone=$'\U1F3B7'
         FONT_ThumbsUp=$'\U1F44D'
     else
-        FONT_PointingArrow="'~'"
-        FONT_ArrowLeft="'<'"
-        FONT_ArrowRight="'>'"
-        FONT_ArrowRightDown="'>'"
-        FONT_ArrowDown="'_'"
-        FONT_PlusMinus="'+-'"
-        FONT_Branch="'|}'"
-        FONT_RefersTo="'*'"
-        FONT_OK="'+'"
-        FONT_Fail="'x'"
-        FONT_Lightning="'!'"
-        FONT_Cog="'{*}'"
-        FONT_Heart="'<3'"
+        FONT_PointingArrow="~"
+        FONT_ArrowLeft="<"
+        FONT_ArrowRight=">"
+        FONT_ArrowRightDown=">"
+        FONT_ArrowDown="_"
+        FONT_PlusMinus="+-"
+        FONT_Branch="|}"
+        FONT_RefersTo="*"
+        FONT_OK="+"
+        FONT_Fail="x"
+        FONT_Lightning="!"
+        FONT_Cog="{*}"
+        FONT_Heart="<3"
         
         # colorful
-        FONT_Star="'*''"
-        FONT_Saxophone="'(YEAH)'"
-        FONT_ThumbsUp="'(OK)'"
+        FONT_Star="*"
+        FONT_Saxophone="(YEAH)"
+        FONT_ThumbsUp="(OK)"
     fi
 }
 

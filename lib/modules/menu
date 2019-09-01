@@ -38,11 +38,28 @@ run()
             local arr="${items[$(( i - 1 ))]}"
             declare -n list="$arr"
 
-            printf " %i) %s\n" "${i}" "$(menu.item "${list[2]}" "${list[0]}" "${list[1]}")"
+            printf " %i) %s\n" "${i}" "$(menu.item "${list[3]}" "${list[0]}" "${list[1]}")"
         done
 
         printf " d) done\n"
 
+        local option
+        read -r -p "Enter your selection: " option
+
+        case "${option}" in
+            d)
+                return
+                ;;
+            *)
+                if [[ "${option}" -gt length ]] || [[ "${option}" -le 0 ]]; then
+                    invalid_option
+                fi
+
+                local arr="${items[$(( option - 1 ))]}"
+                declare -n list="$arr"
+
+                "${list[2]}"
+        esac
 
     done
 }
@@ -62,7 +79,7 @@ checkbox()
                "${FONT_BBLUE}"   \
                "${FONT_RESET}"
     else
-        printf "%s[${FONT_OK}]%s\n" "${FONT_BBLUE}" "${FONT_RESET}"
+        printf "%s[ ]%s\n" "${FONT_BBLUE}" "${FONT_RESET}"
     fi
 }
 
