@@ -51,6 +51,6 @@ __bs__stub_fn()
 
 __bs__stub_fn_def()
 {
-    printf "Do not call functions directly. Use their module syntax.\n" 1>&2
+    printf "Do not call functions directly. Use their module syntax. AT %s\n" "$(caller 1)" 1>&2
     exit 1
 }
