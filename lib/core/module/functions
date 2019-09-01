@@ -2,10 +2,17 @@
 
 __bs__add_module_functions()
 {
-    mapfile -t functions < <(__bs__get_module_functions)
-
+    echo "1"
     __bs__get_module_functions
 
+    echo "2"
+    coproc_send "declare -F"
+    coproc_read
+
+echo "3"
+    mapfile -t functions < <(__bs__get_module_functions)
+
+echo "4"
     echo "${functions[*]}"
 
     for fn in "${functions[@]}"; do
