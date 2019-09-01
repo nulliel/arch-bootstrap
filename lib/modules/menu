@@ -20,8 +20,7 @@ run()
         varname="menu_${i}_${RANDOM}"
         items["${i}"]="$varname"
 
-        declare -An list="${varname}"
-        list=("${1}" "${2}")
+        eval "local ${varname}=('${1}' '${2}')"
 
         i=$((i + 1))
         shift
