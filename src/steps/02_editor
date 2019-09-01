@@ -6,7 +6,7 @@ select_editor()
 {
   local -a editor_list=("vi" "vim" "nano")
 
-  print. "EDITOR - Editor Configuration"
+  print.title "EDITOR - Editor Configuration"
 
   selection "Select editor" "${editor_list[@]}"
 
