@@ -17,12 +17,11 @@ run()
 
     i=0
     while [[ "${#}" -ne 0 ]]; do
-        echo "1"
         varname="menu_${i}_${RANDOM}"
 
         items["${i}"]="$varname"
 
-        eval "local ${varname}=('${1}' '${2}')"
+        eval "local ${varname}=('${1}' '${2}' 0)"
 
         i=$((i + 1))
         shift
@@ -35,12 +34,12 @@ run()
         fi
 
         for i in $(seq 1 "${length}"); do
-            printf " %i) %s\n" "${i}" "test"
+            local arr="${!items[$(( i - 1 )]}"
+
+            printf " %i) %s\n" "${i}" "$(menu.item '${arr[2]}' '${arr[0]} ${!arr[1]}'"
         done
 
         printf " d) done\n"
-
-        exit 1
     done
 }
 
@@ -180,7 +179,7 @@ checkbox()
 ## Print a menu item in the following format:
 ##   [ ] text [state]
 ##
-mainmenu_item()
+item()
 {
     local state=""
 
@@ -189,7 +188,7 @@ mainmenu_item()
     fi
 
     printf "%s %s%s%s %s"     \
-           "$(checkbox "$1")" \
+           "$(menu.checkbox "$1")" \
            "${FONT_BOLD}"     \
            "${2}"             \
            "${FONT_RESET}"    \
