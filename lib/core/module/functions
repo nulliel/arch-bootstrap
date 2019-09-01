@@ -8,16 +8,10 @@ __bs__add_module_functions()
         $(coproc_read)
     )
 
-    echo "${functions[*]}"
-
     for fn in "${functions[@]}"; do
-        echo $fn
-
         if [[ "$(xxd -pu <<< "$fn")" == "0a" ]]; then
             continue
         fi
-
-        echo "$fn"
 
         __bs__add_module_function "$1" "$fn"
     done
