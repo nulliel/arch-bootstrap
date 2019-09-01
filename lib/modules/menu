@@ -17,10 +17,14 @@ run()
 
     i=0
     while [[ "${#}" -ne 0 ]]; do
+        echo "1"
         varname="menu_${i}_${RANDOM}"
-        items["${i}"]="$varname"
+                echo "2"
+                items["${i}"]="$varname"
+                        echo "3"
 
-        eval "local ${varname}=('${1}' '${2}')"
+                        eval "local ${varname}=('${1}' '${2}')"
+                                echo "4"
 
         i=$((i + 1))
         shift
