@@ -17,7 +17,7 @@ run()
 
     i=0
     while [[ "${#}" -ne 0 ]]; do
-        varname="menu_$i_${RANDOM}"
+        varname="menu_${i}_${RANDOM}"
         items["${i}"]="$varname"
 
         declare -An list="${varname}"
