@@ -41,7 +41,7 @@ source "${root_dir}/src/step12_root_password"
 ###############################################################################
 bootstrap::configure()
 {
-    ifndev grep "archiso" "/etc/hostname" || {
+    ifndev grep "archiso" "/etc/hostname" >/dev/null || {
         print.error "This script will only run from an Arch Linux live image"
         exit 1
     }
