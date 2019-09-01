@@ -27,7 +27,6 @@ source "${root_dir}/src/util/menu"
 source "${root_dir}/src/util/device"
 source "${root_dir}/src/util/control_flow"
 source "${root_dir}/src/util/misc"
-source "${root_dir}/src/util/selection"
 source "${root_dir}/src/util/system"
 
 source "${root_dir}/src/boot_mode"
