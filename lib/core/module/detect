@@ -25,10 +25,6 @@ __bs__find_modules()
         for file in "${files[@]}"; do
             if __bs__is_module "${file}"; then
                 __bs__load_module "${file}"
-                __bs__load_module "${file}"
-                __bs__load_module "${file}"
-                __bs__load_module "${file}"
-                __bs__load_module "${file}"
             fi
         done
     done
