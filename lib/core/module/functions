@@ -2,11 +2,7 @@
 
 __bs__add_module_functions()
 {
-    __bs__get_module_functions
-
-exit 1
-echo "3"
-    mapfile -t functions < <(__bs__get_module_functions)
+    mapfile -t functions < <(__bs__get_module_functions | awk '{print $3}')
 
 echo "4"
     echo "${functions[*]}"
