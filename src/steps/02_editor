@@ -8,7 +8,5 @@ select_editor()
 
   print.title "EDITOR - Editor Configuration"
 
-  selection "Select editor" "${editor_list[@]}"
-
-  EDITOR="${SELECTION_VALUE}"
+  selection.create "EDITOR" "Select editor" "${editor_list[@]}"
 }

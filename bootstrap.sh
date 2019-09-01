@@ -8,6 +8,7 @@ fi
 
 activate_module array
 activate_module runtime
+activate_module selection
 
 ###############################################################################
 ## Imports
