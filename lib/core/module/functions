@@ -20,6 +20,9 @@ __bs__add_module_functions()
     coproc_send "echo hi"
     coproc_read
 
+    coproc_send "declare -F | awk '{print \$3}' | grep -v '^__bs__'"
+    coproc_read
+
     __bs__get_module_functions
 
 exit 1
