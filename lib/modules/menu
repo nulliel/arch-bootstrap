@@ -22,7 +22,7 @@ run()
 
     while :; do
         for i in $(seq 1 "${length}"); do
-            printf "hello\n"
+            printf " %i) %s\n" "${i}" "test"
         done
 
         exit 1
