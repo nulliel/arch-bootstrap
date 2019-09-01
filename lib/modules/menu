@@ -19,8 +19,7 @@ run()
     done
 
     while :; do
-        printf "${length}\n"
-        for i in {0..${length}}; do
+        for i in $(seq 1 "${length}"); do
             printf "hello\n"
         done
 
