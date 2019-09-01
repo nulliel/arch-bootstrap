@@ -73,8 +73,8 @@ main()
     bootstrap::configure
 
     menu.run \
-        "Select Keymap" "KEYMAP" \
-        "Select Editor" "EDITOR"
+        "Select Keymap" "KEYMAP" "" \
+        "Select Editor" "EDITOR" ""
 
 exit 0
 
@@ -87,3 +87,97 @@ exit 0
 }
 
 main "$@"
+
+
+
+    printf " 3) %s\n" "$(mainmenu_item                  \
+                             "${checklist[3]}"          \
+                             "Partition Disk"           \
+                             "")"
+    printf " 4) %s\n" "$(mainmenu_item                  \
+                             "${checklist[4]}"          \
+                             "Install Base System"      \
+                             "")"
+    printf " 5) %s\n" "$(mainmenu_item                  \
+                             "${checklist[5]}"          \
+                             "Configure Fstab"          \
+                             "")"
+    printf " 6) %s\n" "$(mainmenu_item                  \
+                             "${checklist[6]}"          \
+                             "Configure Hostname"       \
+                             "")"
+    printf " 7) %s\n" "$(mainmenu_item                  \
+                             "${checklist[7]}"          \
+                             "Configure Timezone"       \
+                             "")"
+    printf " 8) %s\n" "$(mainmenu_item                  \
+                             "${checklist[8]}"          \
+                             "Configure Hardware Clock" \
+                             "")"
+    printf " 9) %s\n" "$(mainmenu_item                  \
+                             "${checklist[9]}"          \
+                             "Configure Locale"         \
+                             "")"
+    printf "10) %s\n" "$(mainmenu_item                  \
+                             "${checklist[10]}"         \
+                             "Configure Mkinitcpio"     \
+                             "")"
+    printf "11) %s\n" "$(mainmenu_item                  \
+                             "${checklist[11]}"         \
+                             "Install Bootloader"       \
+                             "")"
+    printf "12) %s\n" "$(mainmenu_item                  \
+                             "${checklist[12]}"         \
+                             "Configure Root Password"  \
+                             "")"
+
+    printf "\n"
+    printf " d) %s\n" "Done"
+    printf "\n"
+}
+
+print_options()
+{
+    local option
+
+    read -r -p "Enter your selection: " option
+
+    case "${option}" in
+        1)
+            select_keymap
+            checklist[1]=1
+            ;;
+        2)
+            select_editor
+            checklist[2]=1
+            ;;
+        3)
+            partition_disk
+            checklist[3]=1
+            ;;
+        4)
+            install_base_system
+            configure_keymap
+            configure_dns
+            checklist[4]=1
+            ;;
+        5)
+            configure_fstab
+            checklist[5]=1
+            ;;
+        11)
+            install_bootloader
+            checklist[11]=1
+            ;;
+        12)
+            configure_root_password
+            checklist[12]=1
+            ;;
+        d)
+            finish
+            ;;
+        *)
+            invalid_option
+            ;;
+    esac
+}
