@@ -34,15 +34,15 @@ run()
         fi
 
         for i in $(seq 1 "${length}"); do
-            local arr="${!items[$(( i - 1 ))]}"
+            local arr="${items[$(( i - 1 ))]}"
 
             echo "$items"
             echo "${items[0]}"
 
             set | grep "${items[0]}"
 
-            echo "${arr[0]}"
-            echo "${arr[1]}"
+            echo "${!arr[0]}"
+            echo "${!arr[1]}"
 
             printf " %i) %s\n" "${i}" "$(menu.item "a" "${arr[0]}" "${arr[1]}")"
         done
