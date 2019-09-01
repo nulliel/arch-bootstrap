@@ -20,6 +20,8 @@ run()
         shift
     done
 
+    echo "${length}"
+
     while :; do
         for i in $(seq 1 "${length}"); do
             printf "hello\n"
