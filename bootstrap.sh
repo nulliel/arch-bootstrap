@@ -46,7 +46,7 @@ source "${root_dir}/src/boot_mode"
 source "${root_dir}/src/connection"
 
 source "${root_dir}/src/steps/01_keymap"
-source "${root_dir}/src/02_editor"
+source "${root_dir}/src/steps/02_editor"
 source "${root_dir}/src/step03_partition_disk"
 source "${root_dir}/src/step11_install_bootloader"
 source "${root_dir}/src/step12_root_password"
