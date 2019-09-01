@@ -13,6 +13,7 @@ __bs__add_module_functions()
     echo "2"
     coproc_send "declare -F"
     coproc_send "echo $?"
+    coproc_end "echo hi"
     coproc_read
 exit 1
 echo "3"
