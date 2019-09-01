@@ -45,12 +45,13 @@ __bs__get_module_function()
 
 __bs__stub_fn()
 {
+    echo $1
     unset -f "${1}"
     eval "${1}() { __bs__stub_fn_def; }"
 }
 
 __bs__stub_fn_def()
 {
-    printf "Do not call functions directly. Use their module syntax. AT %s\n" "$(caller 2)" 1>&2
+    printf "Do not call functions directly. Use their module syntax. AT %s\n" "$(caller 1)" 1>&2
     exit 1
 }
