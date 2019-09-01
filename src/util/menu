@@ -8,15 +8,16 @@ show_menu()
                              "${checklist[1]}"          \
                              "Select Keymap"            \
                              "${KEYMAP}")"
+    printf " 2) %s\n" "$(mainmenu_item                  \
+                             "${checklist[2]}"          \
+                             "Select Editor"            \
+                             "${EDITOR}")"
 }
 
 _menu()
 {
 
-    printf " 2) %s\n" "$(mainmenu_item                  \
-                             "${checklist[2]}"          \
-                             "Select Editor"            \
-                             "${EDITOR}")"
+
     printf " 3) %s\n" "$(mainmenu_item                  \
                              "${checklist[3]}"          \
                              "Partition Disk"           \
