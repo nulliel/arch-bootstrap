@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# module
+
+##
+# Pause the execution of the script and wait for user input.
+##
+pause()
+{
+    print.line
+
+    if [[ "${#}" -gt 0 ]]; then
+        printf "%s\n" "${1}"
+    fi
+
+    read -r -e -sn 1 -p "Press enter to continue..."
+    printf "\033[1A\r\033[K\033[1A\r\033[K"
+}

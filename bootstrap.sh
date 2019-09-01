@@ -7,6 +7,7 @@ if [[ -n "${DEBUG:-}" ]]; then
 fi
 
 activate_module array
+activate_module runtime
 
 ###############################################################################
 ## Imports
