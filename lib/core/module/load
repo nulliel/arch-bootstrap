@@ -20,6 +20,7 @@ __bs__load_module()
 
     coproc_open
     coproc_send "source '$1'"
+    coproc_read
 
     __bs__add_module_functions "$name"
 
