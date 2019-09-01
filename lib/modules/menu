@@ -37,10 +37,7 @@ run()
             local arr="${items[$(( i - 1 ))]}"
             declare -n list="$arr"
 
-            echo "${list[0]}"
-            echo "${list[1]}"
-
-            printf " %i) %s\n" "${i}" "$(menu.item "a" "${arr[0]}" "${arr[1]}")"
+            printf " %i) %s\n" "${i}" "$(menu.item "${list[2]}" "${list[0]}" "${list[1]}")"
         done
 
         printf " d) done\n"
