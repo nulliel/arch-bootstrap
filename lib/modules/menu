@@ -7,12 +7,12 @@ run()
     local items=()
     local checks=
 
-    if [[ $((length % 2)) -ne 0 ]]; then
+    if [[ $(("${length}" % 2)) -ne 0 ]]; then
         # TODO: Throw
         print.error "Expected an even number of arguments"
     fi
 
-    length=$((length % 2))
+    length=$(("${length}" % 2))
 
     while [[ "${#}" -ne 0 ]]; do
         # items[0]=("${1}" "${2}")
