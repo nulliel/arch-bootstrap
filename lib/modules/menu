@@ -36,7 +36,9 @@ run()
         for i in $(seq 1 "${length}"); do
             local arr="${!items[$(( i - 1 ))]}"
 
-            printf " %i) %s\n" "${i}" "$(menu.item "a" "${arr[0]}" "${!arr[1]}")"
+            echo "${arr[0]}"
+
+            printf " %i) %s\n" "${i}" "$(menu.item "a" "${arr[0]}" "${arr[1]}")"
         done
 
         printf " d) done\n"
