@@ -99,8 +99,6 @@ __bs__create_module()
     eval "${meta}[functions]=$functions"
     eval "${meta}[variables]=$variables"
 
-    echo $functions
-
     __bs__module_list["$1"]="$meta"
 }
 
