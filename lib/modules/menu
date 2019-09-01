@@ -36,7 +36,7 @@ run()
         for i in $(seq 1 "${length}"); do
             local arr="${!items[$(( i - 1 )]}"
 
-            printf " %i) %s\n" "${i}" "$(menu.item '${arr[2]}' '${arr[0]} ${!arr[1]}'"
+            printf " %i) %s\n" "${i}" "$(menu.item '${arr[2]}' '${arr[0]} ${!arr[1]}')"
         done
 
         printf " d) done\n"
@@ -180,7 +180,7 @@ checkbox()
 ## Print a menu item in the following format:
 ##   [ ] text [state]
 ##
-mainmenu_item()
+item()
 {
     local state=""
 
@@ -189,7 +189,7 @@ mainmenu_item()
     fi
 
     printf "%s %s%s%s %s"     \
-           "$(checkbox "$1")" \
+           "$(menu.checkbox "$1")" \
            "${FONT_BOLD}"     \
            "${2}"             \
            "${FONT_RESET}"    \
