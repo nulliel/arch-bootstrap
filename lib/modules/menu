@@ -39,7 +39,7 @@ run()
             declare -n list="$arr"
 
 
-            printf " %i) %s\n" "${i}" "$(menu.item "${list[3]}" "${list[0]}" "${list[1]}")"
+            printf " %i) %s\n" "${i}" "$(menu.item "${list[3]}" "${list[0]}" "${!list[1]}")"
         done
 
         printf " d) done\n"
