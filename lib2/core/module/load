@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+
+## Arguments:
+##
+##   $1 :: The path of the file to load
+##
+## Return:
+##
+##   void
+##
+__bs__load_module()
+{
+    local name;
+
+    # The module name is the file name minus any extension
+    name="$(basename "$1")"
+    name="${name%%.*}"
+
+    __bs__create_module "$name" "$1"
+
+    coproc_open
+    coproc_send "source '$1'"
+
+    __bs__add_module_functions "$name"
+
+    coproc_close
+}
+
+##
+##
+##
+__bs__load_modulea()
+{
+    local name;
+
+    # The module name is the file name minus any extension
+    name="$(basename "$1")";
+    name="${name%%.*}"
+
+    __bs__create_module "${name}"
+
+    __bs__coproc_open
+    __bs__coproc_send 'const() { eval "declare -g __bs__var_const_$1=$2"; }'
+    __bs__coproc_send "source '${1}'"
+    __bs__coproc_send "unset -f const"
+
+    local fns="$(__bs__get_module_fns)"
+    local var="$(__bs__get_module_var)"
+
+    for fn in ${fns[@]}; do
+        if [[ "$(xxd -pu <<< "${fn}")" == "0a" ]]; then
+            continue
+        fi
+
+        local def="$(__bs__get_module_fn "${fn}")"
+
+        __bs__add_module_fn "${name}" "${fn}" "${def}"
+    done
+
+    for vr in ${var[@]}; do
+        if [[ "$(xxd -pu <<< "${vr}")" == "0a" ]]; then
+            continue
+        fi
+
+        local key
+        local val
+
+        IFS=$'=' read -r key val <<< "${vr}"
+
+        __bs__add_module_var "${name}" "${key}" "${val}"
+    done
+
+    __bs__coproc_kill
+}

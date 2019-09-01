@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+
+##
+# Prevent the script from being executed directly.
+##
+if [[ -z "$0" ]] || [[ "$0" == "bash" ]] || [[ "$0" == "-bash" ]]; then
+  printf "This script may only be sourced from other scripts.\n" 1>&2
+  exit 1
+fi
+
+export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
+
+set -o errexit  # Exit when a command returns a non-zero status code
+set -o nounset  # Exit when an unset variable is used
+set -o pipefail # Exit when a command fails in a pipe. eg. command_will_fail | piped_command
+
+##
+# Ensures that the library will only be loaded once.
+#
+# Multiple attempts to load the library will result in an
+# error and exit
+##
+__bs__bootstrap()
+{
+    if [[ "${__bs__bootstrapped:-1}" -eq 0 ]]; then
+        printf "Attempting to bootstrap multiple times.\n" 1>&2
+        exit 1
+    fi
+
+    readonly __bs__bootstrapped=0
+}
+
+__bs__main()
+{
+    __bs__bootstrap
+
+    ##
+    # When scripts are called, their working directory is the directory in which
+    # they were called, not the location they reside.
+    #
+    # This causes issues when including local files, as you may not be in the
+    # directory you expect.
+    #
+    # This remedies this issue by changing the directory to the folder in which the
+    # called script resides.
+    #
+    # Note: greadlink is an osx command
+    #
+    # Arguments:
+    #
+    #   $1 :: The path to resolve
+    ##
+    __bs__resolve_path()
+    {
+        $(type -p greadlink readlink | head -1) -f "$1"
+    }
+
+    declare -g bs_root
+    declare -g bs_self
+
+    bs_root="$(dirname "$(__bs__resolve_path "$0")")"
+    bs_self="$(dirname "$(__bs__resolve_path "${BASH_SOURCE[0]}")")"
+
+    readonly bs_root
+    readonly bs_self
+
+    # shellcheck source=core/coproc
+    source "${bs_self}/core/coproc"
+
+    # shellcheck source=core/module/detect
+    source "${bs_self}/core/module/detect"
+    # shellcheck source=core/module/load
+    source "${bs_self}/core/module/load"
+    # shellcheck source=core/module/module
+    source "${bs_self}/core/module/module"
+    # shellcheck source=core/module/functions
+    source "${bs_self}/core/module/functions"
+
+    # shellcheck source=core/colors
+    source "${bs_self}/core/colors"
+
+    __bs__find_modules "${bs_root}"
+
+    ############
+    ## Bootstrap
+    ############
+    activate_module print
+    # local entrypoint="${1}"
+    # shift
+
+#    bs_activate_module print
+#    __bs__activate_module exception
+
+    # $entrypoint "$@"
+}
+
+__bs__main "$@"

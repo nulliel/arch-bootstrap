@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# module
+
+on_activate()
+{
+    set -o verbose # set -v
+    set -o xtrace  # set -x
+}

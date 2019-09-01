@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+# module
+
+###############################################################################
+## Headers
+###############################################################################
+
+##
+# Print a header on top of the terminal. This clears the terminal to easily
+# get a position on the top of the terminal.
+#
+# Arguments:
+#
+#   $1 :: Text to print
+##
+title()
+{
+    clear
+    print.line
+    printf "%s%s%s\n"      \
+           "${FONT_BOLD}"  \
+           "${1}"          \
+           "${FONT_RESET}" \
+        | fold -sw "$(tput cols)"
+    print.line
+    printf "\n"
+}
+
+##
+# Print a horizontal rule of the character - that fills the console.
+##
+line()
+{
+    printf "%$(tput cols)s\n" | tr " " "-"
+}
+
+###############################################################################
+## Log Levels
+###############################################################################
+
+##
+# Prints a bold message to the terminal
+#
+# Arguments:
+#
+#   $1 :: Text to print
+##
+info()
+{
+    printf "%s%s%s\n"      \
+           "${FONT_BOLD}"  \
+           "${1}"          \
+           "${FONT_RESET}" \
+        | fold -sw "$(tput cols)"
+}
+
+## Print a bold yellow warning message to the terminal.
+##
+## $1 - Text to print.
+##
+print_warning()
+{
+    printf "%s%s%s\n"        \
+           "${FONT_BYELLOW}" \
+           "${1}"            \
+           "${FONT_RESET}"   \
+        | fold -sw "$(tput cols)"
+}
+
+## Print a bold red error message to the terminal.
+##
+## $1 - Text to print.
+##
+print::error()
+{
+    printf "%s%s%s\n"      \
+           "${FONT_BRED}"  \
+           "${1}"          \
+           "${FONT_RESET}" \
+        | fold -sw "$(tput cols)"
+}
+
+
+###############################################################################
+## Prompts
+###############################################################################
+
+## Set the prompt to $1 or to the default selection prompt.
+##
+## $1 - Prompt to set
+##
+set_prompt()
+{
+    PS3="Enter your selection: "
+
+    if [[ "$#" -ge 1 ]]; then
+        PS3="${1}"
+    fi
+}

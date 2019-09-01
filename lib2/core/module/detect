@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+##
+# Finds all modules in the given directories
+#
+# See:
+#
+#   __bs__is_module
+#
+# Arguments:
+#
+#   $@ :: The path(s) from which to search for files
+#
+# Return:
+#
+#   0
+##
+__bs__find_modules()
+{
+    local files
+
+    for arg in "$@"; do
+        mapfile -t files < <(find -L "${arg}" -type f)
+
+        for file in "${files[@]}"; do
+            if __bs__is_module "${file}"; then
+                __bs__load_module "${file}"
+            fi
+        done
+    done
+
+    unset -f __bs__find_modules
+    unset -f __bs__is_module
+    unset -f __bs__load_module
+}
+
+##
+# Checks whether a given file (path) is a module
+#
+# Any file that contains the following in its second line will
+# be treated as a module:
+#
+#   1: #!/usr/bin/env bash
+#   2: # module
+#
+# The space is optional.
+#
+# Arguments:
+#
+#   $1 :: The path of the file to test
+#
+# Return:
+#
+#   0 :: If the file is a module
+#   1 :: If the file is not a module
+##
+__bs__is_module()
+{
+    local line; line="$(awk 'NR==2' "$1")"
+
+    if [[ "$line" =~ ^\#\ ?module ]]; then
+        return 0
+    fi
+
+    return 1
+}

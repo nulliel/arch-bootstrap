@@ -1,0 +1,166 @@
+#!/usr/bin/env bash
+
+##
+# The module list.
+#
+# The module list is an associative array containing a list of
+# registered modules and the variable names in which their metadata
+# is stored.
+#
+# A module has the following format (modeled in JSON)
+#
+# {
+#     functions: object,
+#     variables: object,
+#     loaded:    bool,
+#     path:      string,
+# }
+###
+declare -Ag __bs__module_list=()
+
+##
+# Obtains a module (or submodule) from the module list.
+#
+# This is a variadic function which can contain an arbitrary
+# number of nodes to dive into.
+#
+# Note:
+#
+#   This command must be used with namerefs if getting the
+#   value of an array.
+#
+# Example:
+#
+#   declare -n value="$(module_info module_name module_field)"
+#
+# Arguments:
+#
+#   $1 :: The name of the module
+#   $@ :: The path(s) to the submodule info
+#
+# Return:
+#
+#   0
+#
+# Prints:
+#
+#   The variable name (or value) of the submodule requested
+#
+# Error:
+#
+#   - If the requested module (or submodule) does not exist
+##
+__bs__module_info()
+{
+    if ! __bs__module_exists "$1"; then
+        printf "Module '%s' does not exist\n" "$1" 1>&2
+        exit 1
+    fi
+
+    local -n field="${__bs__module_list[$1]}"
+    shift
+
+    while [[ "$#" -gt 2 ]]; do
+        field="${field[$1]}"
+        shift
+    done
+
+    printf "%s\n" "${field[$1]}"
+}
+
+##
+#
+# Arguments:
+#
+#   $1 :: The name of the module
+#   $2 :: The path of the module
+#
+# Returns:
+#
+#   0
+##
+__bs__create_module()
+{
+    if __bs__module_exists "$1"; then
+        printf "Module '%s' is already defined by %s\n" "$1" "$(module_info "$1" "path")" 1>&2
+        exit 1
+    fi
+
+    declare -r meta="__bs__meta_$1"
+    declare -r functions="__bs__functions_$1"
+    declare -r variables="__bs__variables_$1"
+
+    eval "declare -Ag $meta=()"
+    eval "declare -Ag $functions=()"
+    eval "declare -Ag $variables=()"
+
+    eval "${meta}[loaded]=1"
+    eval "${meta}[path]=$2"
+    eval "${meta}[functions]=$functions"
+    eval "${meta}[variables]=$variables"
+
+    __bs__module_list["$1"]="$meta"
+}
+
+##
+# Returns whether or not the module exists.
+#
+# Arguments:
+#
+#   $1 :: The module name
+#
+# Return:
+#
+#   0 :: The module exists
+#   1 :: The module does not exist
+##
+__bs__module_exists()
+{
+    set +o nounset
+    if [[ -z "${__bs__module_list[$1]+exists}" ]]; then
+        set -o nounset
+        return 1
+    fi
+    set -o nounset
+
+    return 0
+}
+
+activate_module()
+{
+    if ! __bs__module_exists $1; then
+        printf "Module '%s' does not exist\n" "$1" 1>&2
+        exit 1
+    fi
+
+    declare -nr module="${__bs__module_list[${1}]}"
+
+    if [[ "${module[loaded]}" -eq 0 ]]; then
+        return
+    fi
+
+    declare -nr fns="${module[functions]}"
+    declare -nr var="${module[variables]}"
+
+    local activate=1
+
+    set | grep _functions_print
+
+    for name in ${!fns[@]}; do
+        if [[ "${name}" == "on_activate" ]]; then
+            activate=0
+        fi
+
+        eval "${1}.${fns[${name}]}"
+    done
+
+    for name in "${!var[@]}"; do
+        eval "declare -gr ${1}=\"${2}\""
+    done
+
+    if [[ "${activate}" -eq 0 ]]; then
+        "${1}.on_activate"
+    fi
+
+    module[loaded]=0
+}

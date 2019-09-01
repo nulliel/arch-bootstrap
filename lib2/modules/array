@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# module
+
+##
+# Checks whether an array contains the given value
+#
+# Arguments:
+#
+#   $1 :: The variable name of the array
+#   $2 :: The value to search for
+#
+# Return:
+#
+#   0 :: The array contains the value
+#   1 :: The array does not contain the value
+##
+contains()
+{
+    local array="$1[@]"
+    local needle="$2"
+
+    for element in "${!array}"; do
+        if [[ "${element}" == "${needle}" ]]; then
+            return 0
+        fi
+    done
+
+    return 1
+}
