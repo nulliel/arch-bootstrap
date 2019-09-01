@@ -41,6 +41,8 @@ run()
 
             set | grep "${items[0]}"
 
+            echo "$arr"
+
             echo "${!arr[0]}"
             echo "${!arr[1]}"
 
