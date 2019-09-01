@@ -79,7 +79,7 @@ __bs__main()
     # shellcheck source=core/colors
     source "${bs_self}/core/colors"
 
-    __bs__find_modules "${bs_root}"
+    __bs__find_modules "${bs_self}"
 
     ############
     ## Bootstrap
