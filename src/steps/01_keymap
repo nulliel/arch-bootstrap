@@ -22,7 +22,9 @@ select_keymap()
 
     select KEYMAP in "${keymap_list[@]}"; do
         if array.contains "keymap_list" "${KEYMAP}"; then
-            loadkeys "${KEYMAP}"
+            loadkeys "${keymap}"
+            # localectl set-keymap --no-convert "${KEYMAP}"
+            # localectl set-x11-keymap --no-convert "${KEYMAP}"
             break
         else
             invalid_option

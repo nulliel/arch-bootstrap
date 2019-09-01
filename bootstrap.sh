@@ -16,6 +16,7 @@ activate_module array
 # When scripts are executed, they run under the directory in which they
 # were called. This command remedies that by changing the directory to the
 # folder in which the executed file resides.
+##
 declare -rg root_dir="$(dirname "$(readlink -f "$0" || realpath "$0")")" || exit
 
 source "${root_dir}/src/util/print"
@@ -45,8 +46,8 @@ bootstrap::configure()
         exit 1
     }
 
-    # get_boot_mode
-    # check_connection
+    get_boot_mode
+    check_connection
 }
 
 finish()
