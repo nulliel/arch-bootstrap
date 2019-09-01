@@ -12,6 +12,8 @@ __bs__add_module_functions()
     echo "${functions[*]}"
 
     for fn in "${functions[@]}"; do
+        fn="$(echo "$fn" | awk '{print \$3}')"
+
         if [[ "$(xxd -pu <<< "$fn")" == "0a" ]]; then
             continue
         fi
