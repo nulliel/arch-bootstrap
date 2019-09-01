@@ -33,7 +33,7 @@ __bs__add_module_function()
 
 __bs__get_module_functions()
 {
-    coproc_send "declare -F"
+    coproc_send "declare -F | awk '{print \$3}'"
     coproc_read
 }
 
