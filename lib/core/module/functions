@@ -2,7 +2,7 @@
 
 __bs__add_module_functions()
 {
-    coproc_send "declare -F"
+    coproc_send "declare -F | awk '{print \$3}'"
 
     declare -a functions=(
         $(coproc_read)
@@ -11,9 +11,6 @@ __bs__add_module_functions()
     echo "${functions[*]}"
 
     for fn in "${functions[@]}"; do
-        echo $fn
-        fn="$(echo "$fn" | awk '{print $3}')"
-
         echo $fn
 
         if [[ "$(xxd -pu <<< "$fn")" == "0a" ]]; then
