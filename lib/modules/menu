@@ -19,12 +19,10 @@ run()
     while [[ "${#}" -ne 0 ]]; do
         echo "1"
         varname="menu_${i}_${RANDOM}"
-                echo "2"
-                items["${i}"]="$varname"
-                        echo "3"
 
-                        eval "local ${varname}=('${1}' '${2}')"
-                                echo "4"
+        items["${i}"]="$varname"
+
+        eval "local ${varname}=('${1}' '${2}')"
 
         i=$((i + 1))
         shift
@@ -32,7 +30,9 @@ run()
     done
 
     while :; do
-        "$init"
+        if [[ -n "$init" ]]; then
+            "$init"
+        fi
 
         for i in $(seq 1 "${length}"); do
             printf " %i) %s\n" "${i}" "test"
