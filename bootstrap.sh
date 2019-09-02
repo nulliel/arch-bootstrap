@@ -22,22 +22,24 @@ activate_module menu
 ##
 declare -rg root_dir="$(dirname "$(readlink -f "$0" || realpath "$0")")" || exit
 
-source "${root_dir}/src/util/print"
-source "${root_dir}/src/util/menu"
-source "${root_dir}/src/util/device"
-source "${root_dir}/src/util/control_flow"
-source "${root_dir}/src/util/misc"
-source "${root_dir}/src/util/system"
+source "${root_dir}/src/config"
 
 source "${root_dir}/src/boot_mode"
 source "${root_dir}/src/connection"
 
-source "${root_dir}/src/steps/01_keymap"
-source "${root_dir}/src/steps/02_editor"
-source "${root_dir}/src/steps/03_partition_disk"
-source "${root_dir}/src/steps/11/install_bootloader"
-source "${root_dir}/src/step05_configure_fstab"
-source "${root_dir}/src/steps/12_root_password"
+# source "${root_dir}/src/util/print"
+# source "${root_dir}/src/util/menu"
+# source "${root_dir}/src/util/device"
+# source "${root_dir}/src/util/control_flow"
+# source "${root_dir}/src/util/misc"
+# source "${root_dir}/src/util/system"
+
+# source "${root_dir}/src/steps/01_keymap"
+# source "${root_dir}/src/steps/02_editor"
+# source "${root_dir}/src/steps/03_partition_disk"
+# source "${root_dir}/src/steps/11/install_bootloader"
+# source "${root_dir}/src/step05_configure_fstab"
+# source "${root_dir}/src/steps/12_root_password"
 
 ###############################################################################
 ## Script Configuration
@@ -49,8 +51,8 @@ bootstrap::configure()
         exit 1
     }
 
-    # get_boot_mode
-    # check_connection
+    get_boot_mode
+    check_connection
 
     # timedatectl set-ntp true
 }
@@ -77,10 +79,13 @@ print_title()
 main()
 {
     print.title "Arch Bootstrap"
+    print.info  "A set of bash scripts to simplify ArchLinux installation"
+
+    if [[ -f "${root_dir}/bootstrap_config" ]]; then
+        source "${root_dir}/bootstrap_config"
+    fi
 
     bootstrap::configure
-
-PARTITION_DEVICE=""
 
     menu.run \
         "print_title"                            \

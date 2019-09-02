@@ -12,6 +12,10 @@
 2. `wget https://github.com/nulliel/arch-bootstrap/tarball/master -O - | tar xz`
 3. `./bootstrap`
 
+### Automatic Setup
+
+Every time this script runs, an `arch_bootstrap.config` file is placed
+
 ## 
 `docker-compose run test`
 `pacman -Syu awk grep sed`

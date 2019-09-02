@@ -1,22 +1,13 @@
 #!/usr/bin/env bash
 
-## Copyright (c) 2017 helmuthdu <helmuthdu@gmail.com>
-## Copyright (c) 2018 Stephen Ribich <stephen.ribich@gmail.com>
 ##
-## This program is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-##
-## This program is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-## Ping the default route to check if the machine is connected to the internet
+# Pings the default route to check if the machine is connected
+# to the internet
+#
+# Returns:
+#
+#   0 :: The machine has internet connectivity
+#   1 :: The machine does not have internet connectivity
 ##
 test_connection()
 {
@@ -26,14 +17,16 @@ test_connection()
              | grep "default" \
              | awk 'NR==1 { print $3 }')
 
-    if ! sudo ping -q -w 1 -c 1 "${ip}" 1>/dev/null 2>&1; then
+    if ! ping -q -w 1 -c 1 "${ip}" 1>/dev/null 2>&1; then
         return 1
     fi
 
     return 0
 }
 
-## Attempt to connect to the internet if not already done
+##
+# Configures an internet connection if the user has not already
+# done so
 ##
 check_connection()
 {
@@ -55,10 +48,10 @@ check_connection()
         return 0
     fi
 
-    print_title "Network Setup"
+    print.title "Network Setup"
 
-    selection "How would you like to configure the network?" \
-              "${connection_types[@]}"
+    selection.create "How would you like to configure the network?" \
+        "${connection_types[@]}"
 
     case "${SELECTION_VALUE}" in
         "Wired Automatic")
@@ -85,7 +78,7 @@ check_connection()
     esac
 
     if ! test_connection; then
-        print_warning "Can't establish connection. Exiting"
+        print.error "Can't establish connection"
         exit 1
     fi
 }

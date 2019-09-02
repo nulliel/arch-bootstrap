@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+declare CONFIG_FILE="/tmp/bootstrap_config"
+
+init()
+{
+    write_to_config "#!/usr/bin/env bash"
+    write_to_config ""
+    write_to_config "AUTOMATIC_INSTALL=1"
+}
+
+write_to_config()
+{
+    echo "$1" >"${CONFIG_FILE}"
+}
+
+get_config()
+{
+    set +o nounset
+    if [[ -z "${1+exists}" ]]; then
+        set -o nounset
+        return 1
+    fi
+    set -o nounset
+
+    return 0
+}
+
+automatic_install()
+{
+
+}
