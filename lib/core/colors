@@ -5,7 +5,6 @@
 ##
 tput_available()
 {
-    printf "here\n"
     if command -v "tput" 1>/dev/null 2>&1; then
         return 0
     fi
@@ -17,7 +16,6 @@ tput_available()
 ##
 color_available()
 {
-    printf "here\n"
     if [[ "$(tput colors 2>/dev/null)" -ge 8 ]]; then
         return 0
     fi
@@ -38,9 +36,7 @@ unicode_available()
 
 set_colors()
 {
-    printf "here\n"
     if tput_available && color_available; then
-        printf "here\n"
         FONT_RESET="$(tput sgr0)"
 
         # Colors
@@ -60,6 +56,8 @@ set_colors()
         FONT_BLINK="$(tput blink)"
         FONT_INVERT="$(tput rev)"
         FONT_INVISIBLE="$(tput invis)"
+
+        printf "here\n"
     else
         FONT_RESET=""
 
