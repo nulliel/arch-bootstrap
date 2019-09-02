@@ -46,10 +46,10 @@ source "${root_dir}/src/connection"
 ###############################################################################
 bootstrap::configure()
 {
-    ifndev grep "archiso" "/etc/hostname" >/dev/null || {
+    if grep "archiso" "/etc/hostname" >/dev/null; then
         print.error "This script will only run from an Arch Linux live image"
         exit 1
-    }
+    fi
 
     get_boot_mode
     check_connection
