@@ -228,15 +228,13 @@ select_device()
 {
     local device_list
 
-    device_list=(
-        $(lsblk -dp | awk '{ if ($6 == "disk") print $1 }')
-    )
+    mapfile -t device_list < <(lsblk -dp | grep -P "sd|hd|vd|nvme|mmcblk")
 
-    print_title "PARTITION - Select Device"
+    print.title "PARTITION - Select Device"
 
     show_devices
 
-    selection "Select a Device to Partition" \
+    selection.create "Select a Device to Partition" \
               "${device_list[@]}"
 
     PARTITION_DEVICE="${SELECTION_VALUE}"
@@ -716,7 +714,6 @@ mount_partitions()
 ################################################################################
 ## Formatting & Mounting
 ################################################################################
-
 partition_disk()
 {
 #    local partition_layouts=("Default" "LVM")
