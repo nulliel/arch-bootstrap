@@ -82,7 +82,7 @@ checkbox()
                "${FONT_BOLD}${FONT_BLUE}"   \
                "${FONT_RESET}"
     else
-        printf "%s[ ]%s\n" "${${FONT_BOLD}${FONT_BLUE}}" "${FONT_RESET}"
+        printf "%s[ ]%s\n" "${FONT_BOLD}${FONT_BLUE}" "${FONT_RESET}"
     fi
 }
 
