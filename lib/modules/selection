@@ -18,7 +18,7 @@ create()
 
     printf "%s%s%s\n\n" "${FONT_BOLD}" "${title}" "${FONT_RESET}"
 
-    _selection_print "0" "${value}" "${@}"
+    selection._print "0" "${value}" "${@}"
 
     while read -rsn1 key; do
         case "${key}" in
@@ -49,10 +49,10 @@ create()
                 ;;
         esac
 
-        _selection_print "1" "${value}" "$@"
+        selection._print "1" "${value}" "$@"
     done
 
-    _selection_clear "${length}"
+    selection._clear "${length}"
 
     declare -n var="${output}"
     var="${!value}"
@@ -67,7 +67,7 @@ selection_value()
     return 1
 }
 
-_selection_print()
+_print()
 {
     local list_id=1
     local list_age="$1"; shift
@@ -88,7 +88,7 @@ _selection_print()
     done
 }
 
-_selection_clear()
+_clear()
 {
     printf "\033[%iA" "$(( $1 + 1 ))"
 
