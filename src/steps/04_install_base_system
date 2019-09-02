@@ -1,20 +1,5 @@
 #!/usr/bin/env bash
 
-##
-#
-#
-##
-install_base_system()
-{
-    
-}
-
-
-
-
-
-
-
 install_base_system()
 {
     pacstrap /mnt base base-devel parted gdisk dkms linux-headers efibootmgr intel-ucode ntp net-tools

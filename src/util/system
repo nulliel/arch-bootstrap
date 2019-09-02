@@ -17,7 +17,7 @@
 
 arch_chroot()
 {
-    printf "IMPLEMENT - REQUIRES STEP 4"
-    exit 0
-    # arch-chroot MOUNTPOINT /bin/bash -c "$1"
+    # printf "IMPLEMENT - REQUIRES STEP 4"
+    # exit 0
+    arch-chroot /mnt /bin/bash -c "$1"
 }

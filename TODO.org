@@ -5,6 +5,8 @@
 * reFInd
 * GRUB
 
+* MBR
+
 * TODO Implement "Grow a partition" in step03_partition_disk
 * TODO Implement "Shrink a partition" in step03_partition_disk
 * TODO Implement "Add a partition" in step03_partition_disk
