@@ -38,7 +38,7 @@ set_colors()
 {
     if tput_available && color_available; then
         FONT_RESET="$(tput sgr0)"
-
+        printf "here\n"
         # Colors
         FONT_RED="$(tput setaf 1)"
         FONT_GREEN="$(tput setaf 2)"
@@ -47,6 +47,8 @@ set_colors()
         FONT_PURPLE="$(tput setaf 5)"
         FONT_CYAN="$(tput setaf 6)"
         FONT_WHITE="$(tput setaf 7)"
+
+        printf "here\n"
 
         # Flags
         FONT_BOLD="$(tput bold)"
