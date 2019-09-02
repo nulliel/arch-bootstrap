@@ -34,9 +34,9 @@ source "${root_dir}/src/connection"
 
 source "${root_dir}/src/steps/01_keymap"
 source "${root_dir}/src/steps/02_editor"
-source "${root_dir}/src/step03_partition_disk"
+source "${root_dir}/src/steps/03_partition_disk"
 source "${root_dir}/src/step11_install_bootloader"
-source "${root_dir}/src/step12_root_password"
+source "${root_dir}/src/steps/12_root_password"
 
 ###############################################################################
 ## Script Configuration
@@ -50,6 +50,8 @@ bootstrap::configure()
 
     # get_boot_mode
     # check_connection
+
+    timedatectl set-ntp true
 }
 
 finish()
@@ -80,7 +82,9 @@ main()
     menu.run \
         "print_title"                            \
         "Select Keymap" "KEYMAP" "select_keymap" \
-        "Select Editor" "EDITOR" "select_editor"
+        "Select Editor" "EDITOR" "select_editor" \
+        "Partition Disk" "PARTITION_DEVICE" "partition_disk" \
+        "Root Password" "ROOT_PASSWORD_STATUS" "root_password"
 
     finish
 }

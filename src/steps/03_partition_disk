@@ -250,11 +250,8 @@ umount_partitions()
 {
     local partitions
 
-    partitions=(
-        $(lsblk -nro MOUNTPOINT \
-              | sed '/^$/d'     \
-              | sed '/SWAP/d'   \
-              | sort -r)
+    mapfile -t partitions < <(
+        lsblk -nro MOUNTPOINT | sed '/^$/d' | sed '/SWAP/d' | sort -r
     )
 
     # Disable swap in case it is mapped to a mounted partition
