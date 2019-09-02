@@ -8,17 +8,12 @@ run()
 
     local init=""
 
-    echo "$(( length % 3 ))"
-
     if [[ $((length % 3)) -ne 0 ]]; then
         init="$1"
         shift
         length=$(( length - 1 ))
     fi
 
-    echo "$length"
-    echo "$init"
-exit 1
     length=$((length / 3))
 
     i=0

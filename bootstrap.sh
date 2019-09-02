@@ -78,7 +78,7 @@ main()
     bootstrap::configure
 
     menu.run \
-        "print_title"
+        "print_title"                            \
         "Select Keymap" "KEYMAP" "select_keymap" \
         "Select Editor" "EDITOR" "select_editor"
 
