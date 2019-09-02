@@ -79,12 +79,14 @@ main()
 
     bootstrap::configure
 
+PARTITION_DEVICE=""
+
     menu.run \
         "print_title"                            \
         "Select Keymap" "KEYMAP" "select_keymap" \
         "Select Editor" "EDITOR" "select_editor" \
         "Partition Disk" "PARTITION_DEVICE" "partition_disk" \
-        "Bootloader" "BOOTLOADE" "select_bootloader" \
+        "Bootloader" "BOOTLOADER" "select_bootloader" \
         "Root Password" "ROOT_PASSWORD_STATUS" "root_password"
 
     finish
