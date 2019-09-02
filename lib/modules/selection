@@ -16,6 +16,9 @@ create()
     local value="1"
     local length="${#}"
 
+    echo "$title"
+    echo "$output"
+
     printf "%s%s%s\n\n" "${FONT_BOLD}" "${title}" "${FONT_RESET}"
 
     selection._print "0" "${value}" "${@}"
