@@ -51,7 +51,7 @@ bootstrap::configure()
     # get_boot_mode
     # check_connection
 
-    timedatectl set-ntp true
+    # timedatectl set-ntp true
 }
 
 finish()
