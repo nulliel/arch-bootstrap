@@ -62,6 +62,9 @@ run()
 
                 "${list[2]}"
 
+                printf "${list[2]}"
+                exit 1
+
                 if [[ "$?" -ne 0 ]]; then
                     exit 1
                 fi
