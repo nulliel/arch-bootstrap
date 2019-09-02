@@ -63,6 +63,11 @@ finish()
     exit 0
 }
 
+print_title()
+{
+    print.title "Arch Bootstrap"
+}
+
 ###############################################################################
 ## Main
 ###############################################################################
@@ -73,17 +78,11 @@ main()
     bootstrap::configure
 
     menu.run \
+        "print_title"
         "Select Keymap" "KEYMAP" "select_keymap" \
         "Select Editor" "EDITOR" "select_editor"
 
-exit 0
-
-    while :; do
-        print.title "Arch Bootstrap"
-
-        show_menu
-        print_options
-    done
+    finish
 }
 
 main "$@"
