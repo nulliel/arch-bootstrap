@@ -35,7 +35,7 @@ source "${root_dir}/src/connection"
 source "${root_dir}/src/steps/01_keymap"
 source "${root_dir}/src/steps/02_editor"
 source "${root_dir}/src/steps/03_partition_disk"
-source "${root_dir}/src/step11_install_bootloader"
+source "${root_dir}/src/steps/11/install_bootloader"
 source "${root_dir}/src/steps/12_root_password"
 
 ###############################################################################
