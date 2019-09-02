@@ -16,7 +16,7 @@ tput_available()
 ##
 color_available()
 {
-    if [[ "$(tput colors 2>/dev/null)" -ge 16 ]]; then
+    if [[ "$(tput colors 2>/dev/null)" -ge 8 ]]; then
         return 0
     fi
 
