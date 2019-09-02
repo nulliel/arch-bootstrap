@@ -17,10 +17,14 @@ test_connection()
              | grep "default" \
              | awk 'NR==1 { print $3 }')
 
+    echo "$ip"
+
     if ! ping -q -w 1 -c 1 "${ip}" 1>/dev/null 2>&1; then
+        echo "???"
         return 1
     fi
 
+    echo "hi!"
     return 0
 }
 
