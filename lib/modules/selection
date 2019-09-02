@@ -12,12 +12,9 @@
 create()
 {
     local output="${1}"; shift
-    local title="${2}"; shift
+    local title="${1}"; shift
     local value="1"
     local length="${#}"
-
-    echo "$title"
-    echo "$output"
 
     printf "%s%s%s\n\n" "${FONT_BOLD}" "${title}" "${FONT_RESET}"
 
