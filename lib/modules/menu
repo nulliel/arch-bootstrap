@@ -11,6 +11,7 @@ run()
     if [[ $((length % 3)) -ne 0 ]]; then
         init="$1"
         shift
+        length=$(( length - 1 ))
     fi
 
     length=$((length / 3))
