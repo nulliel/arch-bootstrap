@@ -61,7 +61,7 @@ info()
 warning()
 {
     printf "%s%s%s\n"        \
-           "${FONT_BYELLOW}" \
+           "${FONT_YELLOW}" \
            "${1}"            \
            "${FONT_RESET}"   \
         | fold -sw "$(tput cols)"
@@ -74,7 +74,7 @@ warning()
 error()
 {
     printf "%s%s%s\n"      \
-           "${FONT_BRED}"  \
+           "${FONT_RED}"  \
            "${1}"          \
            "${FONT_RESET}" \
         | fold -sw "$(tput cols)"
