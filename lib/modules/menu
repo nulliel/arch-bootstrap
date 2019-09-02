@@ -74,15 +74,15 @@ checkbox()
 {
     if [[ "${1}" -eq 1 ]]; then
         printf "%s[%s%s%s%s%s]%s\n" \
-               "${FONT_BBLUE}"   \
+               "${FONT_BOLD}${FONT_BLUE}"   \
                "${FONT_RESET}"   \
                "${FONT_BOLD}"    \
                "${FONT_OK}" \
                "${FONT_RESET}"   \
-               "${FONT_BBLUE}"   \
+               "${${FONT_BOLD}${FONT_BLUE}}"   \
                "${FONT_RESET}"
     else
-        printf "%s[ ]%s\n" "${FONT_BBLUE}" "${FONT_RESET}"
+        printf "%s[ ]%s\n" "${${FONT_BOLD}${FONT_BLUE}}" "${FONT_RESET}"
     fi
 }
 
@@ -94,7 +94,7 @@ item()
     local state=""
 
     if [[ "$1" -eq 1 && "$3" != "" ]]; then
-        state="${FONT_BGREEN}[${FONT_RESET}${3}${FONT_BGREEN}]${FONT_RESET}"
+        state="${FONT_BOLD}${FONT_GREEN}[${FONT_RESET}${3}${FONT_BOLD}${FONT_GREEN}]${FONT_RESET}"
     fi
 
     printf "%s %s%s%s %s"     \
