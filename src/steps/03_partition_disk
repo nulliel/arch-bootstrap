@@ -241,7 +241,7 @@ umount_partitions()
     swapoff -a
 
     for i in "${partitions[@]}"; do
-        umount "${i}"
+        umount "${i}" || :
     done
 }
 
