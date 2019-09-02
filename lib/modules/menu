@@ -61,6 +61,11 @@ run()
                 declare -n list="$arr"
 
                 "${list[2]}"
+
+                if [[ "$?" -ne 0 ]]; then
+                    exit 1
+                fi
+
                 list[3]=1
         esac
 
