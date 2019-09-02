@@ -47,6 +47,7 @@ source "${root_dir}/src/connection"
 bootstrap::configure()
 {
     if grep "archiso" "/etc/hostname" >/dev/null; then
+        printf "hi\n"
         print.error "This script will only run from an Arch Linux live image"
         exit 1
     fi
