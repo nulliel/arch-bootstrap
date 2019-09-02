@@ -228,7 +228,7 @@ select_device()
 {
     local device_list
 
-    mapfile -t device_list < <(lsblk -dp | grep -P "sd|hd|vd|nvme|mmcblk")
+    mapfile -t device_list < <(lsblk -dp | awk '{print $1}' | grep -P "sd|hd|vd|nvme|mmcblk")
 
     print.title "PARTITION - Select Device"
 
