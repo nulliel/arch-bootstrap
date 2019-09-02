@@ -215,7 +215,7 @@ show_devices()
 
     device_str="$(printf "%s" "${device_arr[*]}" | tr ' ' ',')"
 
-    print_info "Device List"
+    print.info "Device List"
 
     lsblk -npI "${device_str}"        \
         | awk '{ print $1,$4,$6,$7 }' \
