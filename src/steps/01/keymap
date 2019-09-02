@@ -14,10 +14,11 @@ select_keymap()
     local info="Select the system locale and keyboard layout"
 
     mapfile -t keymap_list < <(localectl list-keymaps)
-
+echo "1"
     print.title "${title}"
+    echo "2"
     print.info  "${info}"
-
+echo "3"
     print.set_prompt
 
     select KEYMAP in "${keymap_list[@]}"; do
