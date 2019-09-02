@@ -27,19 +27,8 @@ source "${root_dir}/src/config"
 source "${root_dir}/src/boot_mode"
 source "${root_dir}/src/connection"
 
-# source "${root_dir}/src/util/print"
-# source "${root_dir}/src/util/menu"
-# source "${root_dir}/src/util/device"
-# source "${root_dir}/src/util/control_flow"
-# source "${root_dir}/src/util/misc"
-# source "${root_dir}/src/util/system"
-
-# source "${root_dir}/src/steps/01_keymap"
-# source "${root_dir}/src/steps/02_editor"
-# source "${root_dir}/src/steps/03_partition_disk"
-# source "${root_dir}/src/steps/11/install_bootloader"
-# source "${root_dir}/src/step05_configure_fstab"
-# source "${root_dir}/src/steps/12_root_password"
+source "${root_dir}/src/steps/01/keymap"
+source "${root_dir}/src/steps/02/editor"
 
 ###############################################################################
 ## Script Configuration
@@ -57,6 +46,11 @@ bootstrap::configure()
     # timedatectl set-ntp true
 }
 
+print_title()
+{
+    print.title "Arch Bootstrap"
+}
+
 finish()
 {
     print_title "Install Completed"
@@ -66,11 +60,6 @@ finish()
     fi
 
     exit 0
-}
-
-print_title()
-{
-    print.title "Arch Bootstrap"
 }
 
 ###############################################################################
@@ -89,11 +78,12 @@ main()
     menu.run \
         "print_title"                            \
         "Select Keymap" "KEYMAP" "select_keymap" \
-        "Select Editor" "EDITOR" "select_editor" \
-        "Partition Disk" "PARTITION_DEVICE" "partition_disk" \
-        "Bootloader" "ROOT_PASSWORD_STATUS" "select_bootloader" \
-        "Fstab" "ROOT_PASSWORD_STATUS" "configure_fstab" \
-        "Root Password" "ROOT_PASSWORD_STATUS" "root_password"
+        "Select Editor" "EDITOR" "select_editor"
+
+        # "Partition Disk" "PARTITION_DEVICE" "partition_disk" \
+        # "Bootloader" "ROOT_PASSWORD_STATUS" "select_bootloader" \
+        # "Fstab" "ROOT_PASSWORD_STATUS" "configure_fstab" \
+        # "Root Password" "ROOT_PASSWORD_STATUS" "root_password"
 
     finish
 }
