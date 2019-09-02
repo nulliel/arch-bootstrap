@@ -46,9 +46,7 @@ source "${root_dir}/src/connection"
 ###############################################################################
 bootstrap::configure()
 {
-
     if grep "archiso" "/etc/hostname" >/dev/null; then
-        printf "hi\n"
         print.error "This script will only run from an Arch Linux live image"
         exit 1
     fi
@@ -81,7 +79,6 @@ print_title()
 main()
 {
     print.title "Arch Bootstrap"
-    print.info  "A set of bash scripts to simplify ArchLinux installation"
 
     if [[ -f "${root_dir}/bootstrap_config" ]]; then
         source "${root_dir}/bootstrap_config"
