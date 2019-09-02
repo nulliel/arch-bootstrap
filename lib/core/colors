@@ -151,5 +151,5 @@ check_file_descriptors()
 }
 
 set_colors
-# set_symbols
+set_symbols
 check_file_descriptors
