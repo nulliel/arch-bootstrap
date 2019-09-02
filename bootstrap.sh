@@ -75,6 +75,9 @@ main()
 
     bootstrap::configure
 
+    select_keymap
+    exit 1
+
     menu.run \
         "print_title"                            \
         "Select Keymap" "KEYMAP" "select_keymap" \
