@@ -50,10 +50,14 @@ check_connection()
 
     print.title "Network Setup"
 
-    selection.create "How would you like to configure the network?" \
+    local connection_type
+
+    selection.create                                   \
+        "connection_type"                              \
+        "How would you like to configure the network?" \
         "${connection_types[@]}"
 
-    case "${SELECTION_VALUE}" in
+    case "${connection_type}" in
         "Wired Automatic")
             systemctl start "dhcpcd@${wired_dev}.service"
             ;;
