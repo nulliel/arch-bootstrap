@@ -50,7 +50,7 @@ select_bootloader()
 ##
 configure_bootloader()
 {
-    print_title "BOOTLOADER - Configure Bootloader"
+    print.title "BOOTLOADER - Configure Bootloader"
 
     case "${BOOTLOADER}" in
         "rEFInd")
@@ -79,12 +79,14 @@ configure_syslinux()
 
 configure_grub()
 {
-    print_info "GRUB is the next generation of the GRand Unified Bootloader. GRUB is derived from PUPA which was a research project to develop the next generation of what is now GRUB Legacy. GRUB has been rewritten from scratch to clean up everything and provide modularity and portability"
+    print.info "GRUB is the next generation of the GRand Unified Bootloader. GRUB is derived from PUPA which was a research project to develop the next generation of what is now GRUB Legacy. GRUB has been rewritten from scratch to clean up everything and provide modularity and portability"
+
+    arch_chroot "grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=arch_grub --recheck"
+    arch_chroot "grub-mkconfig -o /boot/grub/grub.cfg"
 }
 
 install_bootloader()
 {
     select_bootloader
-    sleep 10
-    # configure_bootloader
+    configure_bootloader
 }
