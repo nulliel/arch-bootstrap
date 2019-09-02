@@ -58,7 +58,7 @@ info()
 ##
 ## $1 - Text to print.
 ##
-print_warning()
+warning()
 {
     printf "%s%s%s\n"        \
            "${FONT_BYELLOW}" \
@@ -71,7 +71,7 @@ print_warning()
 ##
 ## $1 - Text to print.
 ##
-print::error()
+error()
 {
     printf "%s%s%s\n"      \
            "${FONT_BRED}"  \
