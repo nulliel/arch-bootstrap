@@ -234,10 +234,8 @@ select_device()
 
     show_devices
 
-    selection.create "Select a Device to Partition" \
+    selection.create "PARTITION_DEVICE" "Select a Device to Partition" \
               "${device_list[@]}"
-
-    PARTITION_DEVICE="${SELECTION_VALUE}"
 }
 
 ################################################################################
