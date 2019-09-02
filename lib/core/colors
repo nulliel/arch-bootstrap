@@ -49,13 +49,13 @@ set_colors()
         FONT_WHITE="$(tput setaf 7)"
 
         # Flags
-        FONT_BOLD="$(tput bold || "")"
-        FONT_DIM="$(tput dim || "")"
-        FONT_ITALIC="$(tput sitm || "")"
-        FONT_UNDERLINE="$(tput smul || "")"
-        FONT_BLINK="$(tput blink || "")"
-        FONT_INVERT="$(tput rev || "")"
-        FONT_INVISIBLE="$(tput invis || "")"
+        FONT_BOLD="$(tput bold || :)"
+        FONT_DIM="$(tput dim || :)"
+        FONT_ITALIC="$(tput sitm || :)"
+        FONT_UNDERLINE="$(tput smul || :)"
+        FONT_BLINK="$(tput blink || :)"
+        FONT_INVERT="$(tput rev || :)"
+        FONT_INVISIBLE="$(tput invis || :)"
     else
         FONT_RESET=""
 
