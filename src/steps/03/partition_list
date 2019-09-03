@@ -39,6 +39,7 @@ create_partition()
             "--type") type="$2" ;;
             "--encrypt") encrypt="$2" ;;
             "--swap") swap="$2" ;;
+            "*") print.error "Unknown argument $1"; exit 1 ;;
         esac
 
         shift
