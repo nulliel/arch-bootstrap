@@ -30,7 +30,7 @@ source "${root_dir}/src/connection"
 source "${root_dir}/src/steps/01/keymap"
 source "${root_dir}/src/steps/02/editor"
 source "${root_dir}/src/steps/03/partition_disk"
-source "${root_dir}/src/steps/03/base_system"
+source "${root_dir}/src/steps/04/base_system"
 
 ###############################################################################
 ## Script Configuration
