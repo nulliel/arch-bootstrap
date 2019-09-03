@@ -11,7 +11,7 @@ select_linux_version()
 {
     print.title "BASE SYSTEM - LINUX VERSION"
 
-    declare -s version
+    declare version
     declare -a version_list=(
         "linux"
         "linux-lts"
