@@ -73,12 +73,14 @@ get_device_size_remaining()
     local data_obj
 
     remaining="$(get_device_size "${PARTITION_DEVICE}")"
-
+echo "1"
     # Reduce boot partition
     IFS="," read -ra part_arr <<< "/dev/nvme0n1p1"
+    echo "2"
     remaining="$(( remaining - part_arr[1] ))"
-
+echo "3"
     printf "%i" "${remaining}"
+    echo "4"
     return
 
     # Reduce swap partition
