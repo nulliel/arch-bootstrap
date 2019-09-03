@@ -72,7 +72,13 @@ get_device_size_remaining()
     local part_arr
     local data_obj
 
+    echo "1"
+
     remaining="$(get_device_size "${PARTITION_DEVICE}")"
+
+    echo "2"
+    exit 1
+
 
     # Reduce boot partition
     IFS="," read -ra part_arr <<< "/dev/nvme0n1p1"
