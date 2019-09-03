@@ -44,7 +44,7 @@ create_partition()
         shift
     done
 
-    local pname="partition_$RANDOM_$RANDOM"
+    local pname="partition_${RANDOM}_${RANDOM}"
     eval "${pname}=('${size}' '${filesystem}' '${type}' '${mountpoint}' '${name}' '${encrypt}' '${swap}')"
 
     PARTITION_LIST+=("$pname")
