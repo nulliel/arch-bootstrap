@@ -74,24 +74,24 @@ get_device_size_remaining()
 
     remaining="$(get_device_size "${PARTITION_DEVICE}")"
 
-echo "1"
     # Reduce boot partition
     IFS="," read -ra part_arr <<< "/dev/nvme0n1p1"
-    echo "2"
     remaining="$(( remaining - part_arr[1] ))"
-    echo "3"
+
+    printf "%i" "${remaining}"
+    return
 
     # Reduce swap partition
     # IFS="," read -ra part_arr <<< "${PARTITION_SWAP}"
     # remaining="$(( remaining - part_arr[1] ))"
-echo "4"
+
     # Reduce data partitions
     for data_obj in "${PARTITION_DATA[@]}"; do
         echo "5"
         IFS="," read -ra part_arr <<< "${data_obj}"
         remaining="$(( remaining - part_arr[1] ))"
     done
-echo "6"
+
     printf "%i" "${remaining}"
 }
 
