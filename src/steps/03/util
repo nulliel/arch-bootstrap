@@ -1,0 +1,166 @@
+#!/usr/bin/env bash
+
+################################################################################
+## Size Conversions
+################################################################################
+
+print_size_conversion_chart()
+{
+    print_info "Size Conversion Chart"
+
+    printf "1K ->          1024 Bytes (1 KiB)\n"
+    printf "1M ->       1048576 Bytes (1 MiB)\n"
+    printf "1G ->    1073741824 Bytes (1 GiB)\n"
+    printf "1T -> 1099511627776 Bytes (1 TiB)\n"
+    printf "\n"
+}
+
+print_size_conversion()
+{
+    local power="${1: -1}"
+    local value="${1::-1}"
+
+    local converted
+
+    if [[ ! "${value}" =~ ^[0-9]+$ || "${value}" -eq 0 ]]; then
+        return 1
+    fi
+
+    case "${power}" in
+        "K")
+            converted="$(( 1024 * value ))"
+            ;;
+        "M")
+            converted="$(( 1048576 * value ))"
+            ;;
+        "G")
+            converted="$(( 1073741824 * value ))"
+            ;;
+        "T")
+            converted="$(( 1099511627776 * value ))"
+            ;;
+        *)
+            if [[ ! "${power}" =~ ^[0-9]$ ]]; then
+                return 1
+            fi
+
+            converted="$1"
+            ;;
+    esac
+
+    printf "%i" "${converted}"
+    return 0
+}
+
+################################################################################
+##
+################################################################################
+
+get_device_size()
+{
+    printf "%i" "$(blockdev --getsize64 "$1")"
+}
+
+get_device_size_pretty()
+{
+    pretty_print_size "$(get_device_size "$1")"
+}
+
+get_device_size_remaining()
+{
+    local remaining
+    local part_arr
+    local data_obj
+
+    remaining="$(get_device_size "${PARTITION_DEVICE}")"
+
+    # Reduce boot partition
+    IFS="," read -ra part_arr <<< "${PARTITION_BOOT}"
+    remaining="$(( remaining - part_arr[1] ))"
+
+    # Reduce swap partition
+    IFS="," read -ra part_arr <<< "${PARTITION_SWAP}"
+    remaining="$(( remaining - part_arr[1] ))"
+
+    # Reduce data partitions
+    for data_obj in "${PARTITION_DATA[@]}"; do
+        IFS="," read -ra part_arr <<< "${data_obj}"
+        remaining="$(( remaining - part_arr[1] ))"
+    done
+
+    printf "%i" "${remaining}"
+}
+
+is_space()
+{
+    [[ "$(( $(get_device_size_remaining) - $1 ))" -gt 0 ]] && return 0
+    return 1
+}
+
+pretty_print_size()
+{
+    local size_list=("Bytes" "KiB" "MiB" "GiB" "TiB")
+    local size="$1"
+    local type=0
+
+    while :; do
+        local rounded
+
+        rounded="$(printf "%1.0f" "${size}")"
+
+        if [[ "${rounded}" -lt 1024 ]]; then
+            break
+        fi
+
+        size="$(printf "%s / 1024\n" "${size}" | bc -l)"
+        type="$(( type + 1 ))"
+    done
+
+    printf "%0.1f %s" "${size}" "${size_list[${type}]}"
+}
+
+create_partition()
+{
+    local id="0"
+    local size="0"
+    local filesystem=""
+    local mountpoint=""
+    local name=""
+    local encrypt="no"
+    local swap=""
+    local modify="yes"
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            "--id") id="$2" ;;
+            "--size") size="$2" ;;
+            "--filesystem") filesystem="$2" ;;
+            "--mountpoint") mountpoint="$2" ;;
+            "--name") name="$2" ;;
+            "--encrypt") encrypt="$2" ;;
+            "--swap") swap="$2" ;;
+            "--modify") modify="$2" ;;
+        esac
+
+        shift
+        shift
+    done
+
+    PARTITION_LIST+=(
+        "$(printf "%s,%s,%s,%s,%s,%s,%s,%s" \
+                  "${id}"                   \
+                  "${size}"                 \
+                  "${filesystem}"           \
+                  "${mountpoint}"           \
+                  "${name}"                 \
+                  "${encrypt}"              \
+                  "${swap}"                 \
+                  "${modify}")"
+    )
+}
+
+
+
+
+
+
