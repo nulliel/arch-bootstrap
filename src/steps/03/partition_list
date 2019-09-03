@@ -29,6 +29,8 @@ create_partition()
     local type="8300"
 
     while [[ $# -gt 0 ]]; do
+        echo "$1"
+
         case "$1" in
             "--size") size="$2" ;;
             "--filesystem") filesystem="$2" ;;
@@ -42,8 +44,6 @@ create_partition()
         shift
         shift
     done
-
-echo "???"
 
     PARTITION_LIST+=(
         "$(printf "%s,%s,%s,%s,%s,%s,%s" \
