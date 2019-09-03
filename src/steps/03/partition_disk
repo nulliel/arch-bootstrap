@@ -210,8 +210,8 @@ create_root_partition()
         --mountpoint / \
         --name "Root Partition"
 
-    echo "1"
-    exit 1
+    echo "3"
+    exit 3
 
     # align_data_partitions
 }
