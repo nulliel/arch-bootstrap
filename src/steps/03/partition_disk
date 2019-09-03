@@ -1,1 +1,57 @@
 #!/usr/bin/env bash
+
+declare PARTITION_DEVICE=""
+declare PARTITION_MOUNT=""
+
+################################################################################
+## Device Selection
+################################################################################
+
+##
+# Displays the currently loaded and compatible block-decides
+# that will be used for disk setup
+##
+show_devices()
+{
+    local device_arr
+    local device_str
+
+    device_arr=(
+        $(grep -P "sd|hd|nvme|blkext" "/proc/devices" | awk '{ print $1 }')
+    )
+
+    device_str="$(printf "%s" "${device_arr[*]}" | tr ' ' ',')"
+
+    print.info "Device List"
+
+    lsblk -npI "${device_str}"        \
+        | awk '{ print $1,$4,$6,$7 }' \
+        | column -t
+
+    printf "\n"
+}
+
+select_device()
+{
+    local device_list
+
+    mapfile -t device_list < <(lsblk -dp | awk '{print $1}' | grep -P "sd|hd|vd|nvme|mmcblk")
+
+    print.title "PARTITION - Select Device"
+
+    show_devices
+
+    selection.create                    \
+        "PARTITION_DEVICE"              \
+        "Select a Device to Partition"  \
+        "${device_list[@]}"
+}
+
+################################################################################
+## Formatting & Mounting
+################################################################################
+partition_disk()
+{
+    select_device
+    exit 1
+}
