@@ -1,0 +1,64 @@
+
+install_keyring()
+{
+    print.title "BASE SYSTEM - KEYRING"
+    print.info  "Installing PHP keyring"
+
+    pacman -Sy archlinux-keyring
+}
+
+select_linux_version()
+{
+    print.title "BASE SYSTEM - LINUX VERSION"
+
+    declare -s version
+    declare -a version_list=(
+        "linux"
+        "linux-lts"
+        "linux-hardened"
+    )
+
+    print.set_prompt
+
+    selection.create             \
+        "version"                \
+        "Select A Linux Version" \
+        "${version_list[@]}"
+
+    if [[ "$version" == "linux" ]]; then
+        pacstrap "${MOUNTPOINT}" base linux-headers
+    elif [[ "$version" == "linux-lts" ]]; then
+        pacman -Sg | awk '{ print $2 }' | sed 's|^linux$|linux-lts|g' | pacstrap "${MOUNTPOINT}" - linux-lts-headers
+    elif [[ "$version" == "linux-hardened" ]]; then
+        pacman -Sg | awk '{ print $2 }' | sed 's|^linux$|linux-hardened|g' | pacstrap "${MOUNTPOINT}" - linux-hardened-headers
+    else
+        print.error "Invalid option. Exiting"
+        exit 1
+    fi
+}
+
+install_base_system()
+{
+    install_keyring
+    select_linux_version
+
+    print.title "BASE SYSTEM - INSTALL"
+
+    pacstrap "${MOUNTPOINT}" base-devel parted btrfs-progs f2fs-tools net-tools
+
+    if is_wifi; then
+        pacstrap "${MOUNTPOINT}" iw wireless_tools wpa_supplicant dialog
+
+        local ssid
+        ssid="$(netctl list | grep "^[*+]")"
+
+        if [[ "$?" -eq 0 ]]; then
+            ssid="$(printf "%s" "${ssid}" | cut -c 3-)"
+            cp "/etc/netctl/${ssid}" "${MOUNTPOINT}/etc/netctl/${ssid}"
+
+            arch_chroot "netctl enable '${ssid}'"
+        fi
+    else
+        arch_chroot "systemctl enable dhcpcd@$(active_dev).service"
+    fi
+}
