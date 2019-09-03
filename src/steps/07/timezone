@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+declare TIMEZONE=""
+
+configure_timezone()
+{
+    print.title "TIMEZONE - CONFIGURE TIMEZONE"
+    print.info  "Select your region for setting the timezone"
+
+    local region
+    local regions
+    local subregion
+    local subregions
+
+    regions="$(timedatectl list-timezones | sed 's/\/.*$//' | uniq)"
+
+    print.set_prompt
+
+    select region in "${regions[@}"; do
+        if array.contains "regions" "${region}"; then
+            subregions="$(timedatectl list-timezones | grep "${region}" | sed 's/^.*\///')"
+
+            select subregion in "${subregions[@]}"; do
+                if array.contains "subregions" "${subregion}"; then
+                    break
+                else
+                    runtime.pause "Invalid option. Please try again"
+                fi
+            done
+        else
+            runtime.pause "Invalid option. Please try again"
+        fi
+    done
+
+    arch_chroot "ln -sf /usr/share/zoneinfo/${region}/${subregion} /etc/localtime"
+    arch_chroot "sed -i '/#NTP=/d' /etc/systemd/timesyncd.conf"
+    arch_chroot "sed -i 's/#Fallback//' /etc/systemd/timesyncd.conf"
+    arch_chroot "echo \"FallbackNTP=0.pool.ntp.org 1.pool.ntp.org 0.fr.pool.ntp.org\" >>/etc/systemd/timesyncd.conf"
+    arch_chroot "systemctl enable systemd-timesyncd.service"
+
+    arch_chroot "hwclock --systohc --localtime"
+
+    TIMEZONE="${region}/${subregion}"
+}

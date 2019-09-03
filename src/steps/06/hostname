@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+declare HOSTNAME=""
+
+configure_hostname()
+{
+    local host_name
+
+    print.title "HOSTNAME - CONFIGURE HOSTNAME"
+    print.info "A hostname is a unique name to identify a machine on the network. Hostnames are restructed to alphanumeric characters"
+
+    read -p "Hostname: " host_name
+
+    echo "$host_name" >"${MOUNTPOINT}/etc/hostname"
+
+    arch_chroot "sed -i '/127.0.0.1/s/$/ '${host_name}'/' /etc/hosts"
+    arch_chroot "sed -i '/::1/s/$/ '${hostname}'/' /etc/hosts"
+
+    HOSTNAME="${host_name}"
+}

@@ -7,8 +7,6 @@ install_keyring()
     pacman -Sy archlinux-keyring
 }
 
-MOUNTPOINT="/tmp"
-
 select_linux_version()
 {
     print.title "BASE SYSTEM - LINUX VERSION"
@@ -63,4 +61,7 @@ install_base_system()
     else
         arch_chroot "systemctl enable dhcpcd@$(active_dev).service"
     fi
+
+    arch_chroot "localectl set-keymap --no-convert '${KEYMAP}'"
+    arch_chroot "localectl set-x11-keymap --no-convert '${KEYMAP}'"
 }

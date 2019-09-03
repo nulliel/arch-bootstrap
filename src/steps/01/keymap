@@ -32,6 +32,3 @@ select_keymap()
         fi
     done
 }
-
-# localectl set-keymap --no-convert "${KEYMAP}"
-# localectl set-x11-keymap --no-convert "${KEYMAP}"

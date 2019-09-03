@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+configure_fstab()
+{
+    print.title "FSTAB - CONFIGURE FSTAB"
+
+    if is_uefi; then
+        genfstab -t PARTUUID -p "${MOUNTPOINT}" >>"${MOUNTPOINT}/etc/fstab"
+    else
+        genfstab -U -p "${MOUNTPOINT}" >>"${MOUNTPOINT}/etc/fstab"
+    fi
+}

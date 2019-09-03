@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+declare LOCALE=""
+
+configure_locale()
+{
+    local locale
+    local locales
+
+    locales="$(cat "/etc/locale.gen" | grep UTF-8 | sed 's/\..*$//' | sed '/@/d' | awk '{print $1}' | uniq | sed 's/#//g')"
+
+    select locale in "${locales[@]}"; do
+      if array.contains "locales" "${locale}"; then
+        break
+      else
+        runtime.pause "Invalid option. Try again"
+      fi
+    done
+
+    echo "LANG=\"${locale}.UTF-8\"" >>"${MOUNTPOINT}/etc/locale.conf"
+
+    arch_chroot "sed -i 's/#\('${locale}'\)/\1/' /etc/locale.gen"
+    arch_chroot "locale-gen"
+
+    LOCALE="${locale}"
+}

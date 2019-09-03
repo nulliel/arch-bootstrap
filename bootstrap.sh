@@ -31,6 +31,10 @@ source "${root_dir}/src/steps/01/keymap"
 source "${root_dir}/src/steps/02/editor"
 source "${root_dir}/src/steps/03/partition_disk"
 source "${root_dir}/src/steps/04/base_system"
+source "${root_dir}/src/steps/05/fstab"
+source "${root_dir}/src/steps/06/hostname"
+source "${root_dir}/src/steps/07/timezone"
+source "${root_dir}/src/steps/08/locale"
 
 ###############################################################################
 ## Script Configuration
@@ -90,7 +94,11 @@ main()
         "Select Keymap" "KEYMAP" "select_keymap" \
         "Select Editor" "EDITOR" "select_editor" \
         "Partition Disk" "PARTITION_DEVICE" "partition_disk" \
-        "Install Base System" "EMPTY" "install_base_system"
+        "Install Base System" "EMPTY" "install_base_system" \
+        "Configure Fstab" "EMPTY" "configure_fstab" \
+        "Configure Hostname" "HOSTNAME" "configure_hostname" \
+        "Configure Timezone" "TIMEZONE" "configure_timezone" \
+        "Configure Locale" "LOCALE" "configure_locale"
         # "Partition Disk" "PARTITION_DEVICE" "partition_disk" \
         # "Bootloader" "ROOT_PASSWORD_STATUS" "select_bootloader" \
         # "Fstab" "ROOT_PASSWORD_STATUS" "configure_fstab" \
