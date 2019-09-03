@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+##
+# The `PARTITION_LIST' is a structure for creating
+# partitions
+#
+# The structure is as follows:
+#
+#   ID, Size, Filesystem, Mountpoint, Name, Encrypt, Swap, Modify
+#
+# ID         (Device ID)
+# Size       (Partition Size)       []
+# Filesystem (Partition Filesystem) [ext2, ext3, ext4, btrfs, fat32, vfat]
+# Mountpoint (Partition Mountpoint) [string]
+# Name       (Partition Name)       [string]
+# Encrypt    (Partition Encryption) []
+# Swap       (Partition Swap)       [partition,file]
+# Modify     (Partition Modifyable) []
+##
+declare -a PARTITION_LIST

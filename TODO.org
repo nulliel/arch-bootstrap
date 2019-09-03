@@ -2,6 +2,7 @@
 
 * Encrypted Boot
 * LUKS
+* LVM
 * reFInd
 * GRUB
 

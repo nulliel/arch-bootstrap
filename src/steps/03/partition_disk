@@ -3,6 +3,18 @@
 declare PARTITION_DEVICE=""
 declare PARTITION_MOUNT=""
 
+##
+##
+##
+source "${root_dir}/src/steps/03/util"
+source "${root_dir}/src/steps/03/partition_list"
+
+
+# PARTITION_DEVICE_TRIM=0
+
+# PARTITION_LUKS=0
+# PARTITION_LUKS_DISK=""
+
 ################################################################################
 ## Device Unmounting
 ################################################################################
@@ -75,10 +87,398 @@ select_device()
         "${device_list[@]}"
 }
 
+################################################################################
+## Boot Partition
+################################################################################
 
+create_boot_partition()
+{
+    create_partition --size 536870912            \
+                     --filesystem fat32          \
+                     --mountpoint /boot          \
+                     --name "EFI Boot Partition" \
+                     --writable no
+}
+
+################################################################################
+## Swap Partition
+################################################################################
+
+print_recommended_swap_size()
+{
+    local memory
+    local size
+
+    memory=$(free -g --si     \
+                 | grep "Mem" \
+                 | awk '{ print $2 }')
+
+    if [[ "${memory}" -le 2 ]]; then
+        size=$(( memory * 2 ))
+    elif [[ "${memory}" -le 8 ]]; then
+        size=$(( memory ))
+    elif [[ "${memory}" -le 64 ]]; then
+        size=$(( memory / 2 ))
+    else
+        size=4
+    fi
+
+    print.info "Recommended Swap Size: ${size} GiB"
+}
+
+select_swap_size()
+{
+    local ans
+    local size
+
+    while :; do
+        print.title "PARTITION - Create Swap"
+
+        print_size_conversion_chart
+        print_recommended_swap_size
+
+        read -erp "Swap Size: " ans
+
+        size="$(print_size_conversion "${ans}")" || {
+            invalid_option
+            continue
+        }
+
+        if ! is_space "${size}"; then
+            runtime.pause "Not enough space on device. Try again"
+            continue
+        fi
+
+        swap_size="${size}"
+        break
+    done
+}
+
+create_swap_partition()
+{
+    local swap_size
+    local swap_type
+
+    print.title "PARTITION - Create Swap"
+
+    selection "Select a Swap Implementation" \
+              "Swap Partition"               \
+              "Swap File"                    \
+              "None"
+
+    case "${SELECTION_VALUE}" in
+        "Swap Partition")
+            swap_type="partition"
+            ;;
+        "Swap File")
+            swap_type="file"
+            ;;
+        "None")
+            swap_type="none"
+            ;;
+    esac
+
+    if [[ "${swap_type}" != "none" ]]; then
+        select_swap_size
+    else
+        swap_size=0
+    fi
+
+
+
+    PARTITION_SWAP="2,${swap_size},${swap_type},vfat"
+}
+
+################################################################################
+## Root Partition
+################################################################################
+
+create_root_partition()
+{
+    PARTITION_DATA+=("0,$(get_device_size_remaining),ext4,no,/,Root Partition")
+    align_data_partitions
+}
+
+################################################################################
+## Partition Scheme
+################################################################################
+
+## Assign data partitions a new device id. This is run every time the
+## partition list is modified to preserve a linear device id chain
+##
+align_data_partitions()
+{
+    local -i length="${#PARTITION_DATA[@]}"
+    local -i count=0
+    local -i start=2
+
+    local -a swap_arr
+
+    IFS="," read -r -a swap_arr <<< "${PARTITION_SWAP}"
+
+    if [[ "${swap_arr[2]}" == "partition" ]]; then
+        start=3
+    fi
+
+    while :; do
+        local -- replace="s/^[^,]*,/$(( count + start )),/g"
+
+        local -- row
+
+        row="$(printf "%s" "${PARTITION_DATA[${count}]}")"
+
+        PARTITION_DATA[${count}]="$(printf "%s" "${row}" | sed "${replace}")"
+
+        count=$(( count + 1 ))
+
+        if [[ "${count}" -eq "${length}" ]]; then
+            break
+        fi
+    done
+}
+
+print_scheme()
+{
+    ## Table structure:
+    ##
+    ##   Device, Type, Size, Filesystem, Luks, Mountpoint, Name
+    ##
+    local arr
+    local table
+
+    table="DEVICE,TYPE,SIZE,FILESYSTEM,LUKS,MOUNTPOINT,NAME"
+    table="${table}"$'\n'
+
+    get_device_size_pretty "${PARTITION_DEVICE}"
+
+    populate_disk_table()
+    {
+        table="$(printf "${table}%s,%s,%s,%s,%s,%s,%s"                    \
+                        "${PARTITION_DEVICE}"                             \
+                        "DISK"                                            \
+                        "$(get_device_size_pretty "${PARTITION_DEVICE}")" \
+                        ""                                                \
+                        ""                                                \
+                        ""                                                \
+                        "")"
+        table="${table}"$'\n'
+    }
+
+    populate_boot_table()
+    {
+        IFS="," read -ra arr <<< "${PARTITION_BOOT}"
+
+        table="$(printf "${table}%s,%s,%s,%s,%s,%s,%s"     \
+                        "${PARTITION_DEVICE}${arr[0]}"     \
+                        "PART"                             \
+                        "$(pretty_print_size "${arr[1]}")" \
+                        "${arr[2]}"                        \
+                        "no"                               \
+                        "${arr[3]}"                        \
+                        "EFI Boot Partition")"
+        table="${table}"$'\n'
+    }
+
+    populate_swap_table()
+    {
+        IFS="," read -r -a arr <<< "${PARTITION_SWAP}"
+
+        if [[ "${swap_arr[2]}" == "partition" ]]; then
+            table="$(printf "${table}%s,%s,%s,%s,%s,%s,%s" \
+                       "${PARTITION_DEVICE}${arr[0]}"      \
+                       "SWAP"                              \
+                       "$(pretty_print_size "${arr[1]}")"  \
+                       "${arr[3]}"                         \
+                       "no"                                \
+                       "[SWAP]"                            \
+                       "Swap Partition")"
+            table="${table}"$'\n'
+        fi
+    }
+
+    populate_data_table()
+    {
+        local data
+
+        for data in "${PARTITION_DATA[@]}"; do
+            IFS="," read -r -a arr <<< "${data}"
+
+            table="$(printf "${table}%s,%s,%s,%s,%s,%s,%s" \
+                       "${PARTITION_DEVICE}${arr[0]}"      \
+                       "PART"                              \
+                       "$(pretty_print_size "${arr[1]}")"  \
+                       "${arr[2]}"                         \
+                       "${arr[3]}"                         \
+                       "${arr[4]}"                         \
+                       "${arr[5]}")"
+            table="${table}"$'\n'
+        done
+    }
+
+    print_info "Current Partition Scheme:"
+
+    populate_disk_table
+    populate_boot_table
+    populate_swap_table
+    populate_data_table
+
+    column -t -s ',' <<< "${table}"
+
+    printf "\n"
+}
+
+select_partition()
+{
+    local -a partitions=( "${PARTITION_DATA[@]}" )
+    local -a select_arr=()
+
+    local -- part
+
+    if [[ "$#" -gt 0 && "$1" == "disable_root" ]]; then
+        partitions=( "${partitions[@]:1}" )
+    fi
+
+    for part in "${partitions[@]}"; do
+        local -- id
+
+        id="$(print "%s" "${part}" | sed 's/,.*//')"
+        select_arr+=( "${PARTITION_DEVICE}${id}" )
+    done
+
+    selection "Which device would you like to modify?" \
+              "${select_arr[@]}"                       \
+              "back"
+
+    [[ "${SELECTION_VALUE}" == "back" ]] && return 1
+
+    return 0
+}
+
+add_partition()
+{
+    local name
+    local size
+    local filesystem
+    local luks
+    local mountpoint
+
+    if [[ "${PARTITION_DEVICE_SIZE_REMAINING}" -eq 0 ]]; then
+        pause_function "Can not create a partition with no disk space"
+        return 0
+    fi
+
+    print_title "PARTITION - Create Partition Scheme - Add Partition"
+}
+
+remove_partition()
+{
+    print_title "PARTITION - Create Partition Scheme - Remove Partition"
+
+    select_partition "disable_root" || return 0
+}
+
+create_partition_scheme()
+{
+    while :; do
+        print_title "PARTITION - Create Partition Scheme"
+
+        print_scheme
+
+        sleep 2
+        continue
+
+        print_info "Space Remaining: ${PARTITION_DEVICE_SIZE_REMAINING}GB"
+
+        selection "What would you like to do?" \
+                  "Add a Partition"    \
+                  "Remove a Partition" \
+                  "Extend a Partition" \
+                  "Shrink a Partition" \
+                  "Toggle LUKS"        \
+                  "Set Filesystem"     \
+                  "Set Mountpoint"     \
+                  "Set Name"           \
+                  "Done"
+
+        case "${SELECTION_VALUE}" in
+            "Add a Partition")
+                add_partition
+                ;;
+            "Remove a Partition")
+                remove_partition
+                ;;
+            "Extend a Partition")
+                extend_partition
+                ;;
+            "Shrink a Partition")
+                shrink_partition
+                ;;
+            "Toggle LUKS")
+                toggle_luks
+                ;;
+            "Set Filesystem")
+                set_filesystem
+                ;;
+            "Set Mountpoint")
+                set_mountpoint
+                ;;
+            "Set Name")
+                set_name
+                ;;
+            "Done")
+                break
+                ;;
+        esac
+    done
+}
+
+################################################################################
+## Create Partition
+################################################################################
+
+## https://wiki.archlinux.org/index.php/Partitioning
+##
+create_partitionas()
+{
+    local boot_str="0:0:+512M"
+    local swap_str="0:0:+${PARTITION_SWAP_SIZE_GB}G"
+    local data_str="0:0:+${PARTITION_DATA_SIZE_GB}G"
+
+    sgdisk -Z "${PARTITION_MOUNT}"
+
+    sgdisk -n "${boot_str}" -t 0:ef00 -c 0:"EFI Boot Partition" "${PARTITION_DEVICE}"
+    sgdisk -n "${swap_str}" -t 0:8200 -c 0:"Swap Partition"     "${PARTITION_DEVICE}"
+    sgdisk -n "${data_str}" -t 0:8300 -c 0:"Data Partition"     "${PARTITION_DEVICE}"
+}
 
 ################################################################################
 ## Formatting & Mounting
+################################################################################
+
+## https://wiki.archlinux.org/index.php/File_Systems
+##
+format_partition()
+{
+    local trim=0
+
+    if get_trim "${PARTITION_MOUNT}"; then
+        trim=1
+    fi
+
+    mkfs.fat -F32 "${PARTITION_MOUNT}1"
+    mkfs.vfat "${PARTITION_MOUNT}2"
+    mkfs.ext4 "${PARTITION_MOUNT}3" "$([[ $trim -eq 1 ]] && printf "-E discard")"
+}
+
+mount_partitions()
+{
+    mount "${PARTITION_MOUNT}3" /mnt
+    mkdir /mnt/boot
+    mount "${PARTITION_MOUNT}1" /mnt/boot
+}
+
+################################################################################
+## Main
 ################################################################################
 partition_disk()
 {
@@ -86,7 +486,15 @@ partition_disk()
 
     select_device
 
-    exit 1
+    create_boot_partition
+    create_swap_partition
+    create_root_partition
 
+    create_partition_scheme
+    create_partitions
 
+    # setup_luks
+
+    format_partition
+    mount_partitions
 }

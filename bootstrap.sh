@@ -42,6 +42,12 @@ bootstrap::configure()
     fi
 
     get_boot_mode
+
+    if is_bios; then
+        print.error "BIOS mode is currently not supported"
+        exit 1
+    fi
+
     check_connection
 
     # timedatectl set-ntp true
