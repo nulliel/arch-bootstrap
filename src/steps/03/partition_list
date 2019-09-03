@@ -53,10 +53,6 @@ create_partition()
                   "${encrypt}"              \
                   "${swap}")"
     )
-
-    echo "3"
-    exit 3
-
 }
 
 partition_info()

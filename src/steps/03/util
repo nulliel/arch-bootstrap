@@ -72,9 +72,6 @@ get_device_size_remaining()
     local part_arr
     local data_obj
 
-    echo "1"
-    exit 1
-
     remaining="$(get_device_size "${PARTITION_DEVICE}")"
 
     # Reduce boot partition
