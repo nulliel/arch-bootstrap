@@ -208,10 +208,8 @@ create_root_partition()
         --type 8300 \
         --filesystem ext4 \
         --mountpoint / \
-        --name "Root Partition" \
+        --name "Root Partition"
 
-    echo "2"
-    exit 2
     # align_data_partitions
 }
 
