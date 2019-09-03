@@ -2,6 +2,17 @@
 
 declare -x BOOTLOADER
 
+configure_bootloader()
+{
+    pacstrap "${MOUNTPOINT}" refind-efi os-prober git
+    arch_chroot "refind-install"
+
+    arch_chroot "mkdir /boot/themes; cd /boot/themes; git clone https://github.com/EvanPurkhiser/rEFInd-minimal.git"
+    echo "include themes/rEFInd-minimal/theme.conf" >>/mnt/boot/refind_linux.conf
+
+    $EDITOR ${MOUNTPOINT}/boot/refind_linux.conf
+}
+
 ##
 # https://wiki.archlinux.org/index.php/Category:Boot_loaders
 ##
@@ -48,7 +59,7 @@ select_bootloader()
 
 ##
 ##
-configure_bootloader()
+configure_bootloadera()
 {
     print.title "BOOTLOADER - Configure Bootloader"
 

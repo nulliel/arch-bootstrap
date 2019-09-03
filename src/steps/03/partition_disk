@@ -204,8 +204,13 @@ create_swap_partition()
 
 create_root_partition()
 {
-    PARTITION_DATA+=("0,$(get_device_size_remaining),ext4,no,/,Root Partition")
-    align_data_partitions
+    create_partition --size="$(get_device_size_remaining)}" \
+        --type 8300 \
+        --filesystem ext4 \
+        --mountpoint / \
+        --name "Root Partition" \
+
+    # align_data_partitions
 }
 
 ################################################################################
@@ -476,9 +481,18 @@ format_partition()
         trim=1
     fi
 
-    mkfs.fat -F32 "${PARTITION_MOUNT}1"
-    mkfs.vfat "${PARTITION_MOUNT}2"
-    mkfs.ext4 "${PARTITION_MOUNT}3" "$([[ $trim -eq 1 ]] && printf "-E discard")"
+    # for partition_name in "${PARTITION_LIST[@]}"; do
+    #     case "$(partition_info "${partition_name}" "filesystem")"
+    #         "fat") mkfs.fat -F32 "${PARTITION_DEVICE}"
+    #         "ext4")
+    #     esac
+    #
+    #     sgdisk -n "${size_str}" -t "${type_str}" -c "${name_str}" "${PARTITION_DEVICE}"
+    # done
+
+    # mkfs.fat -F32 "${PARTITION_MOUNT}1"
+    # mkfs.vfat "${PARTITION_MOUNT}2"
+    # mkfs.ext4 "${PARTITION_MOUNT}3" "$([[ $trim -eq 1 ]] && printf "-E discard")"
 }
 
 mount_partitions()
@@ -506,6 +520,6 @@ partition_disk()
 
     # setup_luks
 
-    format_partition
-    mount_partitions
+    # format_partition
+    # mount_partitions
 }

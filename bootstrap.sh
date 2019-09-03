@@ -35,6 +35,9 @@ source "${root_dir}/src/steps/05/fstab"
 source "${root_dir}/src/steps/06/hostname"
 source "${root_dir}/src/steps/07/timezone"
 source "${root_dir}/src/steps/08/locale"
+source "${root_dir}/src/steps/09/mkinitcpio"
+source "${root_dir}/src/steps/10/bootloader"
+source "${root_dir}/src/steps/11/root_password"
 
 ###############################################################################
 ## Script Configuration
@@ -98,11 +101,10 @@ main()
         "Configure Fstab" "EMPTY" "configure_fstab" \
         "Configure Hostname" "HOSTNAME" "configure_hostname" \
         "Configure Timezone" "TIMEZONE" "configure_timezone" \
-        "Configure Locale" "LOCALE" "configure_locale"
-        # "Partition Disk" "PARTITION_DEVICE" "partition_disk" \
-        # "Bootloader" "ROOT_PASSWORD_STATUS" "select_bootloader" \
-        # "Fstab" "ROOT_PASSWORD_STATUS" "configure_fstab" \
-        # "Root Password" "ROOT_PASSWORD_STATUS" "root_password"
+        "Configure Locale" "LOCALE" "configure_locale" \
+        "Configure Mkinitcpio" "EMPTY" "configure_mkinitcpio" \
+        "Configure Bootloader" "BOOTLOADER" "configure_bootloader" \
+        "Root Password" "EMPTY" "configure_root_password"
 
     finish
 }

@@ -10,6 +10,7 @@
 #
 # Size       (Partition Size)       []
 # Filesystem (Partition Filesystem) [ext2, ext3, ext4, btrfs, fat32, vfat]
+# Type       (Partition Type)       [ef00, 8300]
 # Mountpoint (Partition Mountpoint) [string]
 # Name       (Partition Name)       [string]
 # Encrypt    (Partition Encryption) []
@@ -25,6 +26,7 @@ create_partition()
     local name=""
     local encrypt="no"
     local swap=""
+    local type="8300"
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -32,6 +34,7 @@ create_partition()
             "--filesystem") filesystem="$2" ;;
             "--mountpoint") mountpoint="$2" ;;
             "--name") name="$2" ;;
+            "--type") type="$2" ;;
             "--encrypt") encrypt="$2" ;;
             "--swap") swap="$2" ;;
         esac
@@ -41,13 +44,29 @@ create_partition()
     done
 
     PARTITION_LIST+=(
-        "$(printf "%s,%s,%s,%s,%s,%s,%s,%s" \
+        "$(printf "%s,%s,%s,%s,%s,%s,%s" \
                   "${size}"                 \
                   "${filesystem}"           \
+                  "${type}"                 \
                   "${mountpoint}"           \
                   "${name}"                 \
                   "${encrypt}"              \
-                  "${swap}"                 \
-                  "${modify}")"
+                  "${swap}")"
     )
+}
+
+partition_info()
+{
+    local var="$1"
+    local item="$2"
+
+    declare -n arr="${var}"
+
+    case "$item" in
+        "size") printf "%s" "${arr[0]}" ;;
+        "filesystem") printf "%s" "${arr[1]}" ;;
+        "type") printf "%s" "${arr[2]}" ;;
+        "mountpoint") printf "%s" "${arr[3]}" ;;
+        "name") printf "%s" "${arr[4]}" ;;
+    esac
 }

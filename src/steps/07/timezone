@@ -24,6 +24,8 @@ configure_timezone()
                 $(timedatectl list-timezones | grep "${region}" | sed 's/^.*\///')
             )
 
+            print.set_prompt
+
             select subregion in "${subregions[@]}"; do
                 if array.contains "subregions" "${subregion}"; then
                     break
