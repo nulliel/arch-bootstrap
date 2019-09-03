@@ -525,6 +525,6 @@ partition_disk()
 
     # setup_luks
 
-    # format_partition
-    # mount_partitions
+    format_partition
+    mount_partitions
 }
