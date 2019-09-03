@@ -44,16 +44,12 @@ create_partition()
         shift
     done
 
-    PARTITION_LIST+=(
-        "$(printf "%s,%s,%s,%s,%s,%s,%s" \
-                  "${size}"                 \
-                  "${filesystem}"           \
-                  "${type}"                 \
-                  "${mountpoint}"           \
-                  "${name}"                 \
-                  "${encrypt}"              \
-                  "${swap}")"
-    )
+    local pname="partition_$RANDOM_$RANDOM"
+    eval "${pname}=('${size}' '${filesystem}' '${type}' '${mountpoint}' '${name}' '${encrypt}' '${swap}')"
+
+    PARTITION_LIST+=("$pname")
+
+
 }
 
 partition_info()
