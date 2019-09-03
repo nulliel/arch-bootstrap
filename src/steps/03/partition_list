@@ -16,13 +16,10 @@
 # Encrypt    (Partition Encryption) []
 # Swap       (Partition Swap)       [partition,file]
 ##
-declare -a PARTITION_LIST
+declare -a PARTITION_LIST=()
 
 create_partition()
 {
-    echo "2"
-    exit 2
-
     local size="0"
     local filesystem=""
     local mountpoint=""
@@ -45,6 +42,9 @@ create_partition()
         shift
         shift
     done
+
+    echo "2"
+    exit 2
 
     PARTITION_LIST+=(
         "$(printf "%s,%s,%s,%s,%s,%s,%s" \
