@@ -30,9 +30,9 @@ select_linux_version()
     if [[ "$version" == "linux" ]]; then
         pacstrap "${MOUNTPOINT}" base linux-headers
     elif [[ "$version" == "linux-lts" ]]; then
-        pacman -Sg | awk '{ print $2 }' | sed 's|^linux$|linux-lts|g' | pacstrap "${MOUNTPOINT}" - linux-lts-headers
+        pacman -Sg base | awk '{ print $2 }' | sed 's|^linux$|linux-lts|g' | pacstrap "${MOUNTPOINT}" - linux-lts-headers
     elif [[ "$version" == "linux-hardened" ]]; then
-        pacman -Sg | awk '{ print $2 }' | sed 's|^linux$|linux-hardened|g' | pacstrap "${MOUNTPOINT}" - linux-hardened-headers
+        pacman -Sg base | awk '{ print $2 }' | sed 's|^linux$|linux-hardened|g' | pacstrap "${MOUNTPOINT}" - linux-hardened-headers
     else
         print.error "Invalid option. Exiting"
         exit 1
