@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 declare PARTITION_DEVICE=""
-declare PARTITION_MOUNT=""
+declare PARTITION_MOUNT="/mnt"
 
 ##
 ##
@@ -456,7 +456,10 @@ create_partitions()
 {
     local partition_name
 
-    sgdisk -Z "${PARTITION_MOUNT}"
+    echo "${PARTITION_MOUNT}"
+    echo "${PARTITION_DEVICE}"
+
+    sgdisk -Z "${PARTITION_DEVICE}"
 
     for partition_name in "${PARTITION_LIST[@]}"; do
         local size_str="0:0:+$(partition_info "${partition_name}" "size")"
