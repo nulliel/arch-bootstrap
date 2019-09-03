@@ -515,7 +515,7 @@ partition_disk()
     create_swap_partition
     create_root_partition
 
-    create_partition_scheme
+    # create_partition_scheme
     create_partitions
 
     # setup_luks
