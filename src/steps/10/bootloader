@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-declare -x BOOTLOADER
+declare -x BOOTLOADER=""
 
 configure_bootloader()
 {
