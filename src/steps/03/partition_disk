@@ -482,9 +482,9 @@ format_partition()
 {
     local trim=0
 
-    if get_trim "${PARTITION_MOUNT}"; then
-        trim=1
-    fi
+    # if get_trim "${PARTITION_MOUNT}"; then
+    #     trim=1
+    # fi
 
     # for partition_name in "${PARTITION_LIST[@]}"; do
     #     case "$(partition_info "${partition_name}" "filesystem")"
@@ -497,7 +497,7 @@ format_partition()
 
     mkfs.fat -F32 "/dev/nvme0n1p1"
     # mkfs.vfat "${PARTITION_MOUNT}2"
-    mkfs.ext4 "/dev/nvme0n1p2" "$([[ $trim -eq 1 ]] && printf "-E discard")"
+    mkfs.ext4 "/dev/nvme0n1p2" -E discard  # "$([[ $trim -eq 1 ]] && printf "-E discard")"
 }
 
 mount_partitions()
