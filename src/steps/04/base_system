@@ -7,6 +7,8 @@ install_keyring()
     pacman -Sy archlinux-keyring
 }
 
+MOUNTPOINT="/tmp"
+
 select_linux_version()
 {
     print.title "BASE SYSTEM - LINUX VERSION"
