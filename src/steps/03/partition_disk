@@ -466,6 +466,10 @@ create_partitions()
         local type_str="0:$(partition_info "${partition_name}" "type")"
         local name_str="0:$(partition_info "${partition_name}" "name")"
 
+        echo "$size_str"
+        echo "$type_str"
+        echo "$name_str"
+
         sgdisk -n "${size_str}" -t "${type_str}" -c "${name_str}" "${PARTITION_DEVICE}"
     done
 }
