@@ -30,6 +30,7 @@ source "${root_dir}/src/connection"
 source "${root_dir}/src/steps/01/keymap"
 source "${root_dir}/src/steps/02/editor"
 source "${root_dir}/src/steps/03/partition_disk"
+source "${root_dir}/src/steps/03/base_system"
 
 ###############################################################################
 ## Script Configuration
@@ -82,12 +83,14 @@ main()
 
     bootstrap::configure
 
+    local EMPTY=""
+
     menu.run \
         "print_title"                            \
         "Select Keymap" "KEYMAP" "select_keymap" \
         "Select Editor" "EDITOR" "select_editor" \
         "Partition Disk" "PARTITION_DEVICE" "partition_disk" \
-
+        "Install Base System" "EMPTY" "install_base_system"
         # "Partition Disk" "PARTITION_DEVICE" "partition_disk" \
         # "Bootloader" "ROOT_PASSWORD_STATUS" "select_bootloader" \
         # "Fstab" "ROOT_PASSWORD_STATUS" "configure_fstab" \
