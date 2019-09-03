@@ -43,6 +43,8 @@ create_partition()
         shift
     done
 
+echo "???"
+
     PARTITION_LIST+=(
         "$(printf "%s,%s,%s,%s,%s,%s,%s" \
                   "${size}"                 \
