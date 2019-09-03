@@ -158,15 +158,18 @@ create_swap_partition()
 {
     local swap_size
     local swap_type
+    local swap_implementation
 
     print.title "PARTITION - Create Swap"
 
-    selection "Select a Swap Implementation" \
-              "Swap Partition"               \
-              "Swap File"                    \
-              "None"
+    selection.create                   \
+        "swap_implementation"          \
+        "Select a Swap Implementation" \
+        "Swap Partition"               \
+        "Swap File"                    \
+        "None"
 
-    case "${SELECTION_VALUE}" in
+    case "${swap_implementation}" in
         "Swap Partition")
             swap_type="partition"
             ;;
