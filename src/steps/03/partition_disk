@@ -495,16 +495,16 @@ format_partition()
     #     sgdisk -n "${size_str}" -t "${type_str}" -c "${name_str}" "${PARTITION_DEVICE}"
     # done
 
-    # mkfs.fat -F32 "${PARTITION_MOUNT}1"
+    mkfs.fat -F32 "/dev/nvme0n1p1"
     # mkfs.vfat "${PARTITION_MOUNT}2"
-    # mkfs.ext4 "${PARTITION_MOUNT}3" "$([[ $trim -eq 1 ]] && printf "-E discard")"
+    mkfs.ext4 "/dev/nvme0n1p2" "$([[ $trim -eq 1 ]] && printf "-E discard")"
 }
 
 mount_partitions()
 {
-    mount "${PARTITION_MOUNT}3" /mnt
+    mount "/dev/nvme0n1p2" /mnt
     mkdir /mnt/boot
-    mount "${PARTITION_MOUNT}1" /mnt/boot
+    mount "/dev/nvme0n1p1" /mnt/boot
 }
 
 ################################################################################
