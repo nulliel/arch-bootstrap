@@ -459,6 +459,9 @@ create_partition_scheme()
 ##
 create_partitions()
 {
+    echo "ZZ"
+    exit 19
+
     local partition_name
 
     sgdisk -Z "${PARTITION_MOUNT}"

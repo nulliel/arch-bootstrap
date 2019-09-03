@@ -53,6 +53,8 @@ create_partition()
                   "${encrypt}"              \
                   "${swap}")"
     )
+
+        echo "FFIEJF"
 }
 
 partition_info()
