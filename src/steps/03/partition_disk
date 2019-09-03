@@ -204,8 +204,6 @@ create_swap_partition()
 
 create_root_partition()
 {
-    echo "1"
-    exit 1
     create_partition --size="$(get_device_size_remaining)}" \
         --type 8300 \
         --filesystem ext4 \
