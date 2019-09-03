@@ -204,7 +204,7 @@ create_swap_partition()
 
 create_root_partition()
 {
-    create_partition --size "$(get_device_size_remaining)B" \
+    create_partition --size "200G" \
         --type 8300                \
         --filesystem "ext4"        \
         --mountpoint "/"           \
