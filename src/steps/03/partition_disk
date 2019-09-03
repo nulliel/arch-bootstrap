@@ -4,6 +4,29 @@ declare PARTITION_DEVICE=""
 declare PARTITION_MOUNT=""
 
 ################################################################################
+## Device Unmounting
+################################################################################
+
+##
+# Unmounts all currently mounted devices
+##
+umount_partitions()
+{
+    local partitions
+
+    mapfile -t partitions < <(
+        lsblk -nro MOUNTPOINT | sed '/^$/d' | sed '/SWAP/d' | sort -r
+    )
+
+    # Disable swap in case it is mapped to a mounted partition
+    swapoff -a
+
+    for i in "${partitions[@]}"; do
+        umount "${i}" || :
+    done
+}
+
+################################################################################
 ## Device Selection
 ################################################################################
 
@@ -31,11 +54,16 @@ show_devices()
     printf "\n"
 }
 
+##
+# Selects the device (disk) to use for partitioning
+##
 select_device()
 {
     local device_list
 
-    mapfile -t device_list < <(lsblk -dp | awk '{print $1}' | grep -P "sd|hd|vd|nvme|mmcblk")
+    mapfile -t device_list < <(lsblk -dp              \
+                                   | awk '{print $1}' \
+                                   | grep -P "sd|hd|vd|nvme|mmcblk")
 
     print.title "PARTITION - Select Device"
 
@@ -47,11 +75,18 @@ select_device()
         "${device_list[@]}"
 }
 
+
+
 ################################################################################
 ## Formatting & Mounting
 ################################################################################
 partition_disk()
 {
+    umount_partitions
+
     select_device
+
     exit 1
+
+
 }

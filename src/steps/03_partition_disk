@@ -182,25 +182,7 @@ print_size_conversion()
 
 
 
-################################################################################
-## Device Unmounting
-################################################################################
 
-umount_partitions()
-{
-    local partitions
-
-    mapfile -t partitions < <(
-        lsblk -nro MOUNTPOINT | sed '/^$/d' | sed '/SWAP/d' | sort -r
-    )
-
-    # Disable swap in case it is mapped to a mounted partition
-    swapoff -a
-
-    for i in "${partitions[@]}"; do
-        umount "${i}" || :
-    done
-}
 
 ################################################################################
 ## Boot Partition
@@ -662,9 +644,9 @@ partition_disk()
 #    print_title "Partition Layout"
 #    selection "Select a partition scheme:" "${partition_layouts[@]}"
 
-    select_device
 
-    umount_partitions
+
+
 
     create_boot_partition
     create_swap_partition
