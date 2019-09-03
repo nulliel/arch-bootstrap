@@ -7,7 +7,9 @@ configure_locale()
     local locale
     local locales
 
-    locales="$(cat "/etc/locale.gen" | grep UTF-8 | sed 's/\..*$//' | sed '/@/d' | awk '{print $1}' | uniq | sed 's/#//g')"
+    locales=(
+        $(cat "/etc/locale.gen" | grep UTF-8 | sed 's/\..*$//' | sed '/@/d' | awk '{print $1}' | uniq | sed 's/#//g')
+    )
 
     select locale in "${locales[@]}"; do
       if array.contains "locales" "${locale}"; then
