@@ -204,8 +204,6 @@ create_swap_partition()
 
 create_root_partition()
 {
-    $(pretty_print_size $(get_device_size_remaining))
-
     create_partition --size "$(pretty_print_size $(get_device_size_remaining))" \
         --type 8300                \
         --filesystem "ext4"        \
