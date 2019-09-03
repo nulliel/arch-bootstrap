@@ -62,6 +62,6 @@ install_base_system()
         arch_chroot "systemctl enable dhcpcd@$(active_dev).service"
     fi
 
-    arch_chroot "localectl set-keymap --no-convert '${KEYMAP}'"
-    arch_chroot "localectl set-x11-keymap --no-convert '${KEYMAP}'"
+    # arch_chroot "localectl set-keymap --no-convert '${KEYMAP}'"
+    # arch_chroot "localectl set-x11-keymap --no-convert '${KEYMAP}'"
 }
