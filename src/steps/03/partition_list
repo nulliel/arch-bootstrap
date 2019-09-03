@@ -43,9 +43,6 @@ create_partition()
         shift
     done
 
-    echo "2"
-    exit 2
-
     PARTITION_LIST+=(
         "$(printf "%s,%s,%s,%s,%s,%s,%s" \
                   "${size}"                 \
@@ -56,6 +53,10 @@ create_partition()
                   "${encrypt}"              \
                   "${swap}")"
     )
+
+    echo "3"
+    exit 3
+
 }
 
 partition_info()
