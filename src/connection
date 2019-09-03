@@ -86,3 +86,19 @@ check_connection()
         exit 1
     fi
 }
+
+is_wifi()
+{
+    if [[ "$(active_dev)" =~ "wl"* ]]; then
+        return 0
+    fi
+
+    return 1
+}
+
+active_dev()
+{
+    ip route             \
+        | grep "default" \
+        | awk 'NR==1 { print $5 }'
+}

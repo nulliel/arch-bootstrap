@@ -119,45 +119,7 @@ pretty_print_size()
     printf "%0.1f %s" "${size}" "${size_list[${type}]}"
 }
 
-create_partition()
-{
-    local id="0"
-    local size="0"
-    local filesystem=""
-    local mountpoint=""
-    local name=""
-    local encrypt="no"
-    local swap=""
-    local modify="yes"
 
-    while [[ $# -gt 0 ]]; do
-        case "$1" in
-            "--id") id="$2" ;;
-            "--size") size="$2" ;;
-            "--filesystem") filesystem="$2" ;;
-            "--mountpoint") mountpoint="$2" ;;
-            "--name") name="$2" ;;
-            "--encrypt") encrypt="$2" ;;
-            "--swap") swap="$2" ;;
-            "--modify") modify="$2" ;;
-        esac
-
-        shift
-        shift
-    done
-
-    PARTITION_LIST+=(
-        "$(printf "%s,%s,%s,%s,%s,%s,%s,%s" \
-                  "${id}"                   \
-                  "${size}"                 \
-                  "${filesystem}"           \
-                  "${mountpoint}"           \
-                  "${name}"                 \
-                  "${encrypt}"              \
-                  "${swap}"                 \
-                  "${modify}")"
-    )
-}
 
 
 

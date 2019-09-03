@@ -8,13 +8,46 @@
 #
 #   ID, Size, Filesystem, Mountpoint, Name, Encrypt, Swap, Modify
 #
-# ID         (Device ID)
 # Size       (Partition Size)       []
 # Filesystem (Partition Filesystem) [ext2, ext3, ext4, btrfs, fat32, vfat]
 # Mountpoint (Partition Mountpoint) [string]
 # Name       (Partition Name)       [string]
 # Encrypt    (Partition Encryption) []
 # Swap       (Partition Swap)       [partition,file]
-# Modify     (Partition Modifyable) []
 ##
 declare -a PARTITION_LIST
+
+create_partition()
+{
+    local size="0"
+    local filesystem=""
+    local mountpoint=""
+    local name=""
+    local encrypt="no"
+    local swap=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            "--size") size="$2" ;;
+            "--filesystem") filesystem="$2" ;;
+            "--mountpoint") mountpoint="$2" ;;
+            "--name") name="$2" ;;
+            "--encrypt") encrypt="$2" ;;
+            "--swap") swap="$2" ;;
+        esac
+
+        shift
+        shift
+    done
+
+    PARTITION_LIST+=(
+        "$(printf "%s,%s,%s,%s,%s,%s,%s,%s" \
+                  "${size}"                 \
+                  "${filesystem}"           \
+                  "${mountpoint}"           \
+                  "${name}"                 \
+                  "${encrypt}"              \
+                  "${swap}"                 \
+                  "${modify}")"
+    )
+}
