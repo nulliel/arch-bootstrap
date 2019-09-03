@@ -27,6 +27,8 @@ source "${root_dir}/src/config"
 source "${root_dir}/src/boot_mode"
 source "${root_dir}/src/connection"
 
+source "${root_dir}/src/util/system"
+
 source "${root_dir}/src/steps/01/keymap"
 source "${root_dir}/src/steps/02/editor"
 source "${root_dir}/src/steps/03/partition_disk"
