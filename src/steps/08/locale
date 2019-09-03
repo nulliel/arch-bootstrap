@@ -11,6 +11,8 @@ configure_locale()
         $(cat "/etc/locale.gen" | grep UTF-8 | sed 's/\..*$//' | sed '/@/d' | awk '{print $1}' | uniq | sed 's/#//g')
     )
 
+    print.set_prompt
+
     select locale in "${locales[@]}"; do
       if array.contains "locales" "${locale}"; then
         break
