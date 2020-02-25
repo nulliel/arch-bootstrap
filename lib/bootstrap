@@ -1,97 +1,448 @@
 #!/usr/bin/env bash
 
-##
-# Prevent the script from being executed directly.
-##
-if [[ -z "$0" ]] || [[ "$0" == "bash" ]] || [[ "$0" == "-bash" ]]; then
-  printf "This script may only be sourced from other scripts.\n" 1>&2
-  exit 1
+################################################################################
+## Configs
+################################################################################
+if [[ -z "${BOOTSTRAP_DIR}" ]]; then
+    printf "[\e[1;91mERROR\e[0m] BOOTSTRAP_DIR is not set\n" 1>&2
+    exit 1
 fi
 
+################################################################################
+## Debugging
+################################################################################
 export PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
 
 set -o errexit  # Exit when a command returns a non-zero status code
 set -o nounset  # Exit when an unset variable is used
-set -o pipefail # Exit when a command fails in a pipe. eg. command_will_fail | piped_command
+set -o pipefail # Exit when a command fails in a pipe
 
+################################################################################
+## Import Aliases
+################################################################################
+shopt -s expand_aliases
+
+alias import="Import::Main"
+alias source="Import::Main"
+alias .="Import::Main"
+
+################################################################################
+## Cache
+################################################################################
+
+## Returns whether the cache is enabled
 ##
-# Ensures that the library will only be loaded once.
-#
-# Multiple attempts to load the library will result in an
-# error and exit
+## The cache is enabled by default but can be disabled
+## by setting the `DISABLE_CACHE' environment variable
+## to any value.
 ##
-__bs__bootstrap()
+## Returns:
+##
+##   0 :: The cache is enabled
+##   1 :: The cache is disabled
+##
+function Bootstrap::IsCacheEnabled()
 {
-    if [[ "${__bs__bootstrapped:-1}" -eq 0 ]]; then
-        printf "Attempting to bootstrap multiple times.\n" 1>&2
+    if [[ -n "${DISABLE_CACHE:-}" ]]; then
+        return 1
+    fi
+}
+
+################################################################################
+## Import
+################################################################################
+declare -a BASH_STARTER_IMPORT_HOOKS=()
+declare -a BASH_STARTER_IMPORTED_FILES=()
+
+if Bootstrap::IsCacheEnabled; then
+    BASH_STARTER_IMPORT_SOURCES=(
+        "${BOOTSTRAP_DIR}"
+        "${BASH_STARTER_IMPORT_SOURCES[@]}"
+    )
+fi
+
+## Attempts to import a file
+##
+## If any hook returns a non-zero status code, the
+## module will not be imported.
+##
+## Arguments:
+##
+##   $1 :: The package to import
+##
+Import::Main()
+{
+    if [[ -z "${1+x}" ]]; then
+        printf "%s Import::Main expects 1 argument\n" \
+               "[\e[1;91mERROR\e[0m]"                 \
+               1>&2
         exit 1
     fi
 
-    readonly __bs__bootstrapped=0
+    local package="${1}"
+    local importFile="${BOOTSTRAP_DIR}/${package}"
+
+    if Import::IsLoaded "${package}"; then
+        return 0
+    fi
+
+    if ! Bootstrap::IsCacheEnabled; then
+        importFile="$(mktemp)"
+    fi
+
+    if [[ "${package}" == "/"* || "${package}" == "./"* ]]; then
+        importFile="${package}"
+    fi
+
+    Import::System "${package}" || Import::Sources "${package}" "${importFile}"
+
+    if [[ ! -f "${importFile}" ]]; then
+        printf "[\e[1;91mERROR\e[0m] Unable to import package '%s'\n" "${package}" 1>&2
+        exit 1
+    fi
+
+    IMPORTED_FILES+=("${package}")
+
+    if Import::RunHooks "${importFile}"; then
+        builtin source "${importFile}"
+    fi
 }
 
-__bs__main()
+## Attempts to import a file from the filesystem
+##
+## A file will attempt to be loaded from the filesystem if it
+## begins with either `/` or `./`
+##
+## Arguments:
+##
+##   $1 :: The package name
+##
+## Returns:
+##
+##  0 :: The file was imported
+##  1 :: The file was not imported
+##
+Import::System()
 {
-    __bs__bootstrap
+    local package="${1}"
 
-    ##
-    # When scripts are called, their working directory is the directory in which
-    # they were called, not the location they reside.
-    #
-    # This causes issues when including local files, as you may not be in the
-    # directory you expect.
-    #
-    # This remedies this issue by changing the directory to the folder in which the
-    # called script resides.
-    #
-    # Note: greadlink is an osx command
-    #
-    # Arguments:
-    #
-    #   $1 :: The path to resolve
-    ##
-    __bs__resolve_path()
+    if [[ "${package}" != "/"* && "${package}" != "./"* ]]; then
+        return 1
+    fi
+
+    if [[ ! -f "${package}" ]]; then
+        return 1
+    fi
+
+    importFile="${package}"
+}
+
+# Attempts to import a file from one of the sources defined
+## in `IMPORT_SOURCES`
+##
+## Arguments:
+##
+##   $1 :: The package name
+##   $2 :: The location to save the cached file
+##
+## Returns:
+##
+##  0 :: The file was imported
+##  1 :: The file was not imported
+##
+Import::Sources()
+{
+    local package="${1}"
+    local cacheFile="${2}"
+
+    for source in "${BASH_STARTER_IMPORT_SOURCES[@]}"; do
+        if [[ "${source}" == "http://"* || "${source}" == "https://"* ]]; then
+            if Import::HTTP "${source}" "${package}" "${cacheFile}"; then
+                return 0
+            fi
+        elif [[ "${source}" == "/"* || "${source}" == "./"* ]]; then
+            if Import::System "${source}/${package}"; then
+                return 0
+            fi
+        else
+            printf "[\e[1;91mERROR\e[0m] Unknown import source '%s'\n" \
+                   "${source}"                                         \
+                   1>&2
+            exit 1
+        fi
+    done
+}
+
+## Attempts to import a file from a HTTP URL
+##
+## Arguments:
+##
+##   $1 :: The base URL to download from
+##   $2 :: The package name (url extension) to download
+##   $3 :: The path to save the downloaded file to
+##
+## Returns:
+##
+##   0 :: The file was downloaded successfully
+##   1 :: The file failed to download
+##
+Import::HTTP()
+{
+    local source="${1}"
+    local package="${2}"
+    local outFile="${3}"
+
+    if [[ ! -d "$(dirname "${outFile}")" ]]; then
+        mkdir -p "$(dirname "${outFile}")"
+    fi
+
+    if command -v curl 1>/dev/null 2>&1; then
+        curl --fail -sL --retry 3 -H "Cache-Control: no-cache" -o "${outFile}" "${source}/${package}" || return 1
+    else
+        wget -t 3 -O - -o "${outFile}" "${source}/${package}" || return 1
+    fi
+}
+
+##
+## Adds an import hook.
+##
+## Import hooks allow user-defined functions to handle the
+## final import process.
+##
+## An import hook will be passed the full path to a file
+## being imported. If the function returns 0 the file will
+## be imported. If the function returns any other value, the
+## file will not be imported.
+##
+## This allows a function to act as an independant processor in
+## which it can return 0 and perform its' own import.
+##
+## This is useful for the module system outlined in core/module
+##
+## Arguments:
+##
+##   $1 :: The function to add as an import hook
+##
+Import::AddHook()
+{
+    local functionName="$1"
+
+    for element in "${IMPORT_HOOKS[@]}"; do
+        if [[ "${element}" == "${functionName}" ]]; then
+            printf "[\e[1;91mERROR\e[0m] Attempted to register hook '%s' twice\n" \
+                   "${functionName}" 1>&2
+            exit 1
+        fi
+    done
+
+    IMPORT_HOOKS+=("${functionName}")
+}
+
+## Runs all `IMPORT_HOOKS` against a provided `localFile`
+##
+## See `Import::AddHook` for information on hooks.
+##
+## Arguments:
+##
+##   $1 :: The file to run hooks against
+##
+## Return:
+##
+##   0 :: If the file should be imported
+##   1 :: If the file should not be imported
+##
+Import::RunHooks()
+{
+    local localFile="${1}"
+
+    for hook in "${IMPORT_HOOKS[@]}"; do
+        if ! "${hook}" "${localFile}"; then
+            return 1
+        fi
+    done
+
+    return 0
+}
+
+## Returns whether an import has already been loaded.
+##
+## Arguments:
+##
+##   $1 :: The package name to check
+##
+## Return:
+##
+##   0 :: The package has been loaded
+##   1 :: The package has not been loaded
+##
+Import::IsLoaded()
+{
+    local package="${1}"
+
+    for file in "${IMPORTED_FILES[@]}"; do
+        if [[ "${file}" == "${package}" ]]; then
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+##
+##
+##
+
+## https://github.com/mkropat/sh-realpath
+##
+##
+realpath()
+{
+    assert_no_path_cycles()
     {
-        $(type -p greadlink readlink | head -1) -f "$1"
+        local path
+        local target="${1}"
+
+        shift
+
+        for path in "${@}"; do
+            if [[ "${path}" == "${target}" ]]; then
+                return 1
+            fi
+        done
     }
 
-    declare -g bs_root
-    declare -g bs_self
+    prepend_dir_context()
+    {
+        if [[ "${1}" == "." ]]; then
+            printf "%s\n" "${2}"
+        else
+            case "${2}" in
+                /* ) printf "%s\n" "${2}" ;;
+                * )  printf "%s\n" "${1}/${2}" ;;
+            esac
+        fi
+    }
 
-    bs_root="$(dirname "$(__bs__resolve_path "$0")")"
-    bs_self="$(dirname "$(__bs__resolve_path "${BASH_SOURCE[0]}")")"
+    resolve_symlinks()
+    {
+        assert_no_path_cycles "$@" || return
 
-    readonly bs_root
-    readonly bs_self
+        local context
+        local path && path="$(readlink -- "${1}")"
 
-    # shellcheck source=core/coproc
-    source "${bs_self}/core/coproc"
+        if [[ "${?}" -eq 0 ]]; then
+            context="$(dirname -- "${1}")"
 
-    # shellcheck source=core/module/detect
-    source "${bs_self}/core/module/detect"
-    # shellcheck source=core/module/load
-    source "${bs_self}/core/module/load"
-    # shellcheck source=core/module/module
-    source "${bs_self}/core/module/module"
-    # shellcheck source=core/module/functions
-    source "${bs_self}/core/module/functions"
+            resolve_symlinks "$(prepend_dir_context "${context}" "${path}")" "${@}"
+        else
+            printf "%s\n" "${1}"
+        fi
+    }
 
-    # shellcheck source=core/colors
-    source "${bs_self}/core/colors"
+    realpath()
+    {
+        local path && path="$(resolve_symlinks "${1}")"
 
-    __bs__find_modules "${bs_self}"
+        if [[ -d "${path}" ]]; then
+            (cd "$1" 2>/dev/null && pwd -P)
+        else
+            local dir file
+            dir=$(dirname -- "$1")
+            file=$(basename -- "$1")
+            (cd "$dir" 2>/dev/null && printf '%s/%s\n' "$(pwd -P)" "$file")
+        fi
+    }
 
-    ############
-    ## Bootstrap
-    ############
-    activate_module print
-    # local entrypoint="${1}"
-    # shift
-
-#    bs_activate_module print
-#    __bs__activate_module exception
-
-    # $entrypoint "$@"
+    realpath "$@"
 }
 
-__bs__main "$@"
+################################################################################
+## Bootstrap
+################################################################################
+
+## Ensures that **Bash Starter** is only loaded once
+##
+## Multiple attempts to load the library will result in an
+## error and the script will exit.
+##
+Bootstrap::Load()
+{
+    if [[ "${BASH_STARTER_BOOTSTRAPPED:-1}" -eq 0 ]]; then
+        printf "%s Attempted to bootstrap multiple times\n" \
+               "[\e[1;91mERROR\e[0m]"                       \
+               1>&2
+        exit 1
+    fi
+
+    readonly BASH_STARTER_BOOTSTRAPPED=0
+}
+
+## Turns a path containing symbolic links and directory
+## operators into an absolute path to the real file.
+##
+## Note: greadlink is an osx command
+##
+## Arguments:
+##
+##   $1 :: The path to resolve
+##
+## Returns:
+##
+##   PRINT :: The real path of the provided path
+##
+## Exits:
+##
+##  1 :: When missing a required argument
+##
+Bootstrap::ResolvePath()
+{
+    if [[ -z "${1+x}" ]]; then
+        printf "%s Bootstrap::ResolvePath expects 1 argument\n" \
+               "[\e[1;91mERROR\e[0m]"                           \
+               1>&2
+        exit 1
+    fi
+
+    realpath "${1}"
+}
+
+## Bootstraps Bash Starter by loading the core modules
+## necessary for generic module loading
+##
+Bootstrap::Main()
+{
+    Bootstrap::Load
+
+    ############################################################################
+    ## Default Modules
+    ############################################################################
+    import "core/coproc"
+    import "core/module"
+
+    for module in "${BASH_STARTER_DEFAULT_MODULES[@]}"; do
+        import "${module}"
+    done
+
+    ############################################################################
+    ## Paths
+    ############################################################################
+    declare -g SCRIPT_ROOT
+    declare -g SCRIPT_SELF
+
+    ## A scripts working directory is the directory in which they were called,
+    ## not the location they reside.
+    ##
+    ## This can lead to unexpected behavior when referencing local files, as
+    ## the current directory may be different than expected.
+    ##
+    ## By using these variables, we can instead work strictly with known
+    ## paths.
+    ##
+    SCRIPT_ROOT="$(dirname "$(Bootstrap::ResolvePath "$0")")"
+    SCRIPT_SELF="$(dirname "$(Bootstrap::ResolvePath "${BASH_SOURCE[0]}")")"
+
+    readonly SCRIPT_ROOT
+    readonly SCRIPT_SELF
+}
+
+Bootstrap::Main "$@"

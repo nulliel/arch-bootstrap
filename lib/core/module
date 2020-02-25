@@ -1,0 +1,152 @@
+#!/usr/bin/env bash
+
+###############################################################################
+## Module Loading
+###############################################################################
+
+##
+# Checks whether a given file (path) is a module
+#
+# Any file that contains the following in its second line will
+# be treated as a module:
+#
+#   1: #!/usr/bin/env bash
+#   2: # module
+#
+# The space is optional.
+#
+# Arguments:
+#
+#   $1 :: The path of the file to test
+#
+# Return:
+#
+#   0 :: If the file is a module
+#   1 :: If the file is not a module
+##
+Module::IsModule()
+{
+    local line; line="$(awk 'NR==2' "$1")"
+
+    if [[ "$line" =~ ^\#\ ?module ]]; then
+        return 0
+    fi
+
+    return 1
+}
+
+##
+# Arguments:
+#
+#   $1 :: The path of the file to load
+##
+Module::Load()
+{
+    local name;
+
+    # The module name is the file name minus any extension
+    name="$(basename "${1}")"
+    name="${name%%.*}"
+
+    Coproc::Open
+    Coproc::Send "source '${1}'"
+    Coproc::Read
+
+    Module::ExtractFunctions "$name"
+
+    Coproc::Close
+
+    if declare -F "${name}.onActivate" 1>/dev/null 2>&1; then
+        "${name}.onActivate"
+    fi
+}
+
+###############################################################################
+## Module Creation
+###############################################################################
+
+##
+# Given an active coproc session, extracts all given functions
+# and transforms them into a module sytax.
+#
+# All functions will be prefixed with the module name.
+#
+# e.g.
+#
+# Given a module defined in `print.sh`
+#
+#   doSomething() {
+#       return 0
+#   }
+#
+# Will be called as such:
+#
+#   print.doSomething
+#
+# Arguments:
+#
+#   $1 :: The module name
+##
+Module::ExtractFunctions()
+{
+    Coproc::Send "declare -F"
+
+    local functions; mapfile -t functions < <(Coproc::Read)
+
+    local activate=0
+
+    for fn in "${functions[@]}"; do
+        fn="$(echo "${fn}" | awk '{ print $3 }')"
+
+        if [[ "$(xxd -pu <<< "${fn}")" == "0a" ]]; then
+            continue
+        fi
+
+        Module::Stub "${fn}"
+        Coproc::Send "declare -f ${fn}"
+
+        eval "${1}.$(Coproc::Read)"
+    done
+}
+
+##
+# Stubs a module function to prevent it from being called directly.
+#
+# An attempt to call the function will instead call Module::StubDef.
+##
+Module::Stub()
+{
+    unset -f "${1}"
+    eval "${1}() { Module::StubDef; }"
+}
+
+Module::StubDef()
+{
+    printf "Do not call functions directly. Use their module syntax. AT %s\n" "$(caller 1)" 1>&2
+    exit 1
+}
+
+###############################################################################
+## Module Hook
+###############################################################################
+
+##
+# Hooks the importer for loading modules.
+#
+# See `Import::AddHook` for details.
+##
+Module::Hook()
+{
+    local modulePath="${1}"
+
+    if ! Module::IsModule "${modulePath}"; then
+        return 0
+    fi
+
+    Module::Load "${modulePath}"
+
+    return 1
+}
+
+import "core/coproc"
+Import::AddHook Module::Hook

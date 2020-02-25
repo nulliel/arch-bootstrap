@@ -2,6 +2,8 @@
 
 [![Build Status](https://img.shields.io/travis/nulliel/arch-bootstrap/master.svg?style=flat-square)]()
 
+Eases the [Arch Linux](https://www.archlinux.org/) installation process.
+
 ## Prerequisites
 * A working internet connection
 * Logged in as `root`
